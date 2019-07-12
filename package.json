@@ -1,0 +1,26 @@
+{
+  "name": "node-lti-1.3-library",
+  "version": "0.1.0",
+  "description": "IMS-LTI 1.3 Tool Provider built in NodeJS",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Godmartinz/Node-LTI-1.3-library.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Godmartinz/Node-LTI-1.3-library/issues"
+  },
+  "homepage": "https://github.com/Godmartinz/Node-LTI-1.3-library#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "ims-lti": "^3.0.2",
+    "morgan": "^1.9.1",
+    "nodemon": "^1.19.1"
+  }
+}
