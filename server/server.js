@@ -4,12 +4,14 @@ const routes = require("./routes");
 const {check, validationResult}  = require('express-validator');
 const bodyParser = require('body-parser');
 
+
 const app = express();
 
 app.use(express.static("public"));
 app.use(morgan("dev"));
 app.use('/routes', routes);
 app.use(express.json());
+
 
 app.set('views', './views');
 app.set('view engine', 'ejs');
@@ -21,6 +23,15 @@ app.get("/", (req, res) => {
 app.get("/project/submit/:projectname", (req, res) => {
   const food = { candy: 'candy' };
   res.render('submit', food);
+
+});
+
+app.post("/project/authenticate/:projectname", (req, res) => {
+  const mockObject = {
+    bob: "alsoBob"
+  };
+  res.status(200).json(mockObject);
+
 });
 /* Validates all required keys are strings and are populated */
 app.post("/project/authenticate/:projectname", 
