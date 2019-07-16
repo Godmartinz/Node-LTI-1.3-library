@@ -9,9 +9,16 @@
     </head>
 
     <body>
+
       <div>
         <h1>Ooo, a piece of <%= candy %>.</h1>
       </div>
+
+      <form action="/project/authenticate/projectname" method="POST">
+        <label for='github' >enter your github url:</label>
+        <input id='github' name='github'>
+        <input type='submit'>
+      </form>
 
     </body>
 

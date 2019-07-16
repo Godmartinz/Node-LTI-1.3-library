@@ -1,5 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
+const bodyParser = require('body-parser');
 const routes = require("./routes");
 const {check, validationResult}  = require('express-validator');
 
@@ -9,6 +10,8 @@ const app = express();
 
 app.use(express.static("public"));
 app.use(morgan("dev"));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/routes', routes);
 app.use(express.json());
 
@@ -44,7 +47,16 @@ app.post("/project/authenticate/:projectname",
     check('user_role').exists().isString().contains("http://purl.imsglobal.org/vocab/lis/v2/membership#Learner").withMessage("The role of the user is not learner or undefined"),
     check('project_name').exists().isString().not().isEmpty().withMessage("There is an error with the project_name")
 ],(req, res) => {
-    
+
+  const url = req.body;
+  if (url.github.includes('github', 'heroku')) {
+    res.status(200).send(grade, 'ok');
+    let grade = {grade: 100}
+  } else {
+    res.status(200).send(grade, 'invalid url')
+    let grade = {grade: 0}
+  };
+
     const errors= validationResult(req);
     if(!errors.isEmpty()){
       return res.status(422).json({errors: errors.array()});
