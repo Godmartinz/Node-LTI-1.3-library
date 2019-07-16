@@ -27,4 +27,12 @@ app.post("/project/authenticate/:projectname", (req, res) => {
   res.status(200).json(mockObject);
 });
 
+app.post(`/project/authentication/test`, validate(validation.userInfo) , (req,res) => {
+
+  res.json(200);
+});
+
+
+
+
 module.exports = app;
