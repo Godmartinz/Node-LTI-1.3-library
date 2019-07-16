@@ -1,12 +1,15 @@
 const express = require("express");
 const morgan = require("morgan");
 const routes = require("./routes");
+const  validate = require('express-validation');
+const bodyParser = require('body-parser');
 
 const app = express();
 
 app.use(express.static("public"));
 app.use(morgan("dev"));
 app.use('/routes', routes);
+app.use(bodyParser.json());
 
 app.set('views', './views');
 app.set('view engine', 'ejs');
@@ -27,7 +30,7 @@ app.post("/project/authenticate/:projectname", (req, res) => {
   res.status(200).json(mockObject);
 });
 
-app.post(`/project/authentication/test`, validate(validation.userInfo) , (req,res) => {
+app.post(`/project/authentication/:projectname`, validate(validation.userInfo) , (req,res) => {
 
   res.json(200);
 });
