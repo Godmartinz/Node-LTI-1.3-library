@@ -26,44 +26,27 @@ app.get("/project/submit/:projectname", (req, res) => {
 
 });
 
-app.post("/project/authenticate/:projectname", (req, res) => {
-  const mockObject = {
-    bob: "alsoBob"
-  };
-  res.status(200).json(mockObject);
-
-});
-/* Validates all required keys are strings and are populated */
+/* Validates all required keys are strings and are populated. These may need to be updated moving forward. */
 app.post("/project/authenticate/:projectname", 
- [ check('lti_message_type').isString().not().isEmpty(),
-    check('lti_version').isString().not().isEmpty(),
-    check('Oauth_consumer_key').isString().not().isEmpty(),
-    check('resource_link_id').isString().not().isEmpty(),
-    check('client_id').isString().not().isEmpty(),
-    check('redirect_uri').isString().not().isEmpty(),
-    check('response_type').isString().not().isEmpty(),
-    check('scope').isString().not().isEmpty(),
-    check('custom_user_role').isString().not().isEmpty(),
-    check('custom_project_name').isString().not().isEmpty()
+ [ check('https://purl.imsglobal.org/spec/lti/claim/message_type').exists().isString().not().isEmpty(),
+    check('https://purl.imsglobal.org/spec/lti/claim/version').exists().isString().not().isEmpty(),
+    check('https://purl.imsglobal.org/spec/lti/claim/deployment_id').exists().isString().not().isEmpty(),
+    check('https://purl.imsglobal.org/spec/lti/claim/resource_link').exists(),
+    check('client_id').exists().isString().not().isEmpty(),
+    check('https://purl.imsglobal.org/spec/lti/claim/roles').exists().isArray(),
+    check('redirect_uri').exists().isString().not().isEmpty(),
+    check('response_type').exists().isString().not().isEmpty(),
+    check('scope').exists().isString().not().isEmpty(),
+    check('custom_user_role').exists().isString().not().isEmpty(),
+    check('custom_project_name').exists().isString().not().isEmpty()
 ],(req, res) => {
-  
+    
     const errors= validationResult(req);
     if(!errors.isEmpty()){
       return res.status(422).json({errors: errors.array()});
     }
-    let userInfo={
-      lti_message_type:req.body.lti_message_type,
-      lti_version: req.body.lti_version,
-      Oauth_consumer_key: req.body.Oauth_consumer_key,
-      resource_link_id: req.body.resource_link_id,
-      client_id: req.body.client_id,
-      redirect_uri: req.body.redirect_uri,
-      response_type:req.body.response_type,
-      scope:req.body.scope,
-      custom_user_role:req.body.custom_user_role,
-      custom_project_name:req.body.custom_project_name
-    }
-  res.send(200, userInfo).json(userInfo);
+    
+  res.send(200).json(req);
 });
 
 
