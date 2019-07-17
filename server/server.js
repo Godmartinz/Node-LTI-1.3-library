@@ -31,31 +31,26 @@ app.get("/project/submit/:projectname", (req, res) => {
 });
 
 app.post(`/project/submit/projectname`, (req, res) => {
-  switch (req.body) {
-  case req.body:
-    const url = req.body;
-    if (url.github.includes('.herokuapp.com') || url.github.includes('github.com')) {
-      axios
-      .get(url.github)
-        .then( response => {
-          let grading = {
-            url: url.github,
-            urlStatus: response.status,
-            grade: 1
-          };
-          res.render('submit', {food: 'candy', formData: grading});
-        })
-        .catch( err => console.log(err))
-    } else {
-      let grading = {
-        url: url.github,
-        urlStatus: 'Sorry, the Urls you provided are not valid.',
-        grade: 0
-      };
-      res.render('submit', {food: 'candy', formData: grading});
-
-    }
-    break;
+  const url = req.body;
+  if (url.github.includes('.herokuapp.com') || url.github.includes('github.com')) {
+    axios
+    .get(url.github)
+      .then( response => {
+        let grading = {
+          url: url.github,
+          urlStatus: response.status,
+          grade: 1
+        };
+        res.render('submit', {food: 'candy', formData: grading});
+      })
+      .catch( err => console.log(err))
+  } else {
+    let grading = {
+      url: url.github,
+      urlStatus: 'Sorry, the Urls you provided are not valid.',
+      grade: 0
+    };
+    res.render('submit', {food: 'candy', formData: grading});
   }
 })
 
