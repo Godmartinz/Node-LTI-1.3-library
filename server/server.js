@@ -2,7 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 const routes = require("./routes");
 const {check, validationResult}  = require('express-validator');
-const bodyParser = require('body-parser');
+
 
 
 const app = express();
@@ -28,18 +28,21 @@ app.get("/project/submit/:projectname", (req, res) => {
 
 /* Validates all required keys are strings and are populated. These may need to be updated moving forward. */
 app.post("/project/authenticate/:projectname", 
- [ check('https://purl.imsglobal.org/spec/lti/claim/message_type').exists().isString().not().isEmpty(),
-    check('https://purl.imsglobal.org/spec/lti/claim/version').exists().isString().not().isEmpty(),
-    check('https://purl.imsglobal.org/spec/lti/claim/deployment_id').exists().isString().not().isEmpty(),
-    check('https://purl.imsglobal.org/spec/lti/claim/resource_link').exists(),
-    check('client_id').exists().isString().not().isEmpty(),
-    check('sub').exists().isString(),
-    check('https://purl.imsglobal.org/spec/lti/claim/roles').exists().isArray(),
-    check('redirect_uri').exists().isString().not().isEmpty(),
-    check('response_type').exists().isString().not().isEmpty(),
-    check('scope').exists().isString().not().isEmpty(),
-    check('custom_user_role').exists().isString().not().isEmpty(),
-    check('custom_project_name').exists().isString().not().isEmpty()
+ [ check('https://purl.imsglobal.org/spec/lti/claim/message_type').exists().isString().not().isEmpty().withMessage("There is an error in the message type"),
+    check('https://purl.imsglobal.org/spec/lti/claim/version').exists().isString().not().isEmpty().withMessage("There is an error with the version"),
+    check('https://purl.imsglobal.org/spec/lti/claim/deployment_id').exists().isString().not().isEmpty().withMessage("There is an error with the deployment_id"),
+    check('https://purl.imsglobal.org/spec/lti/claim/resource_link').exists().withMessage("There is an error with the resource_link"),
+    check('client_id').exists().isString().not().isEmpty().withMessage("There is an error with the client_id"),
+    check('sub').exists().isString().withMessage("There is an error with the sub"),
+    check('https://purl.imsglobal.org/spec/lti/claim/roles').exists().isArray().withMessage("There is error with the roles array"),
+    check('redirect_uri').exists().isString().not().isEmpty().withMessage("There is an error with the redirect_uri"),
+    check('response_type').exists().isString().not().isEmpty().withMessage("There is an error with the response type"),
+    check('scope').exists().isString().not().isEmpty().withMessage("There is an error with the scope"),
+    check('custom_user_role').exists().isString().not().isEmpty().withMessage("There is an error with the user role"),
+    check('custom_project_name').exists().isString().not().isEmpty().withMessage("There is an error with the project name"),
+    check('user_id').exists().isString().not().isEmpty().withMessage("There is an error with the user id"),
+    check('user_role').exists().isString().contains("http://purl.imsglobal.org/vocab/lis/v2/membership#Learner").withMessage("The role of the user is not learner or undefined"),
+    check('project_name').exists().isString().not().isEmpty().withMessage("There is an error with the project_name")
 ],(req, res) => {
     
     const errors= validationResult(req);
@@ -47,10 +50,8 @@ app.post("/project/authenticate/:projectname",
       return res.status(422).json({errors: errors.array()});
     }
     
-  res.send(200).json(req);
+  res.send(200).json(req.body);
 });
-
-
 
 
 
