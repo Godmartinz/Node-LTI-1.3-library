@@ -1,18 +1,78 @@
 <!DOCTYPE html>
-  <html lang="en">
+<html lang="en">
 
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta http-equiv="X-UA-Compatible" content="ie=edge">
-      <title>Project Submission: </title>
-    </head>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <body>
-      <div>
-        <h1>Ooo, a piece of <%= candy %>.</h1>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  <title>Project Submission: </title>
+
+</head>
+
+<body>
+
+  <div class="text-center">
+    <h1>Project Submission form + </form> <%= candy %>. if you get a good grade</h1>
+  </div>
+
+  <div class="container col-sm-5">
+    <form>
+      <div class="form-group">
+        <label>Enter Github URL</label>
+        <input type="url" class="form-control" placeholder="Enter github url here" id="github" required>
       </div>
 
-    </body>
+      <div class="form-group">
+        <label for="exampleInputPassword1">Enter Heroku/Now URL</label>
+        <input type="url" class="form-control" placeholder="Enter heroku/now url here" required>
+      </div>
 
-  </html>
+      <% let value = false %>
+
+      <% if(value == true) { %>
+      <div class="alert alert-success" id="success-alert">
+        <strong>Congrats! your project was submitted successfully</strong>
+      </div>
+      <% } %>
+
+      <div class="alert alert-danger hide" id="error-alert">
+        <strong></strong>
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="test">Submit</button> <button type="button"
+        class="btn btn-danger" id="cancel">cancel</button>
+
+    </form>
+  </div>
+
+  <script>
+    // success message goes here
+    var x = document.getElementById("test", "cancel");
+    if (x.addEventListener) {
+      x.addEventListener("click", myFunction);
+    } else if (x.attachEvent) {
+      x.attachEvent("onclick", myFunction);
+    }
+
+    function myFunction() {
+      document.getElementById("success-alert", "error-alert").innerHTML = "Congrats! your project was submitted successfully";
+    }
+
+    // error message goes here
+    var x = document.getElementById("cancel");
+    if (x.addEventListener) {
+      x.addEventListener("click", myFunction1);
+    } else if (x.attachEvent) {
+      x.attachEvent("onclick", myFunction1);
+    }
+    function myFunction1() {
+      document.getElementById("error-alert").innerHTML = "Oops, something went wrong...your project wasn't able to submit successfully";
+    }
+  </script>
+</body>
+
+</html>

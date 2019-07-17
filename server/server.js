@@ -26,6 +26,7 @@ app.get("/project/submit/:projectname", (req, res) => {
 
 });
 
+
 /* Validates all required keys are strings and are populated. These may need to be updated moving forward. */
 app.post("/project/authenticate/:projectname", 
  [ check('https://purl.imsglobal.org/spec/lti/claim/message_type').exists().isString().not().isEmpty().withMessage("There is an error in the message type"),
