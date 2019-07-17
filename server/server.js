@@ -47,7 +47,13 @@ app.post(`/project/submit/projectname`, (req, res) => {
         })
         .catch( err => console.log(err))
     } else {
-      res.status(200).send({grade: 0})
+      let grading = {
+        url: url.github,
+        urlStatus: 'Sorry, the Urls you provided are not valid.',
+        grade: 0
+      };
+      res.render('submit', {food: 'candy', formData: grading});
+
     }
     break;
   }
