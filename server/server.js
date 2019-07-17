@@ -61,11 +61,12 @@ app.post('/oauth2/token', (req, res) => {
 });
 
 app.get("/project/submit/:projectname", (req, res) => {
-  res.render('submit', {projectName: 'candy'});
+  res.render('submit', {food: 'candy'});
 });
 
 app.post(`/project/submit/projectname`, (req, res) => {
   const url = req.body;
+
   if ( url.github.includes('github.com') && (url.heroku.includes('.herokuapp.com') || url.heroku.includes('now.sh'))) {
     axios
     .get(url.github) 
