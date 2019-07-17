@@ -80,7 +80,7 @@ app.get('/project/submit/:projectname', (req, res) => {
     }
   });
 
-// Audience (aud):  <base url>   &&    Issuer is <base url>/oauth2/token
+// Audience (aud):  <base url>   &&    
 app.post('/oauth2/token', (req, res) => {
   const errors = valid_oauth2_request(req);
   if (errors.length === 0) {  // no errors
