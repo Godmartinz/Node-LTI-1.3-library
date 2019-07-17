@@ -36,12 +36,12 @@ app.post("/project/authenticate/:projectname",
     check('sub').exists().isString().withMessage("There is an error with the sub"),
     check('https://purl.imsglobal.org/spec/lti/claim/roles').exists().isArray().withMessage("There is error with the roles array"),
     check('redirect_uri').exists().isString().not().isEmpty().withMessage("There is an error with the redirect_uri"),
-    check('response_type').exists().isString().not().isEmpty().withMessage("There is is an error with the response type"),
+    check('response_type').exists().isString().not().isEmpty().withMessage("There is an error with the response type"),
     check('scope').exists().isString().not().isEmpty().withMessage("There is an error with the scope"),
     check('custom_user_role').exists().isString().not().isEmpty().withMessage("There is an error with the user role"),
     check('custom_project_name').exists().isString().not().isEmpty().withMessage("There is an error with the project name"),
     check('user_id').exists().isString().not().isEmpty().withMessage("There is an error with the user id"),
-    check('user_role').exists().isString().contains("Learner").withMessage("The role of the user is not learner or undefined"),
+    check('user_role').exists().isString().contains("http://purl.imsglobal.org/vocab/lis/v2/membership#Learner").withMessage("The role of the user is not learner or undefined"),
     check('project_name').exists().isString().not().isEmpty().withMessage("There is an error with the project_name")
 ],(req, res) => {
     
