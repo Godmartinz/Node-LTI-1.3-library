@@ -11,14 +11,22 @@
     <body>
 
       <div>
-        <h1>Ooo, a piece of <%= candy %>.</h1>
+        <h1>Ooo, a piece of <%= food %>.</h1>
       </div>
 
-      <form action="/project/authenticate/projectname" method="POST">
+      <form action='/project/submit/projectname' method='POST'>
         <label for='github' >enter your github url:</label>
         <input id='github' name='github'>
         <input type='submit'>
       </form>
+
+      <% if(formData!=null){ %>    
+        <div>
+          <p>url: <%= formData.url %> </p>
+          <p>urlStatus: <%= formData.urlStatus %> </p>
+          <p>grade: <%= formData.grade %></p>
+        </div>
+      <%}%> 
 
     </body>
 
