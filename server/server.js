@@ -98,7 +98,8 @@ app.post(`/project/submit/projectname`, (req, res) => {
       .catch( err => console.log(err))
   } else {
     let grading = {
-      url: url.github,
+      gitUrl: url.github,
+      heroUrl: url.heroku,
       urlStatus: 'Sorry, the URLs you provided are not valid.',
       grade: 0
     };
