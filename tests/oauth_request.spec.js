@@ -9,6 +9,7 @@ describe('OAuth2.0 flow', function() {
   let url = 'http://localhost:8888';
   let token_url = url + '/oauth2/token';
   let good_data = null;
+  let saved_token = null;
 
   beforeEach(() => {
     good_data = {
@@ -44,6 +45,7 @@ describe('OAuth2.0 flow', function() {
       })
     })
     .then(res => {
+      saved_token = res.data;
       expect(res.status).to.equal(200);
     })
     .catch(err => {
@@ -132,5 +134,17 @@ describe('OAuth2.0 flow', function() {
     .catch(error => {
       console.log(`***error caught ${error}`);
     });
+  });
+
+  it('should make a GET successfully with a valid token', () => {
+    return axios.get(url+'/project/submit/react100',{headers: {Authorization: 'Bearer ' + saved_token}})
+      .then(r => expect(r.status).to.equal(200))
+      .catch(error => console.log(`***error caught ${error}`));
+  });
+
+  it('should get an error if GET made with a valid token', () => {
+    return axios.get(url+'/project/submit/react100',{headers: {Authorization: 'Bearer ' + saved_token + 'fake'}})
+      .catch(r => expect(r.response.status).to.equal(401))
+      .catch(error => console.log(`***error caught ${error}`));
   });
 });
