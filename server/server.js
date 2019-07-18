@@ -123,7 +123,7 @@ app.post(`/project/submit/projectname`, (req, res) => {
           gitUrl: url.github,
           heroUrl: url.heroku,
           urlStatus: response.status,
-          grade: 1,
+          grade: 1
         };
         res.render('submit', {projectName: 'candy', formData: grading});
       })
