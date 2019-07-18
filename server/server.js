@@ -79,6 +79,38 @@ app.get('/project/submit/:projectname', (req, res) => {
       }
     }
   });
+
+// Audience (aud):  <base url>   &&    Issuer is <base url>/oauth2/token
+app.post('/oauth2/token', (req, res) => {
+  const errors = valid_oauth2_request(req);
+  if (errors.length === 0) {  // no errors
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Pragma', 'no-cache');
+    res.status(200).send({
+      access_token: process.env.ACCESS_TOKEN,
+      expires_in: 600,      // 10 minutes
+      token_type: 'bearer',
+      state: req.state
+    });
+  } else {
+      if (errors.findIndex(e => e.includes('grant type invalid')) >= 0) {
+        res.status(400).send({
+          error: 'unsupported_grant_type',
+          errors: errors
+        });
+      } else if (errors.findIndex(e => e.includes('invalid')) >= 0) {
+        res.status(401).send({
+          error: 'invalid_client',
+          errors: errors
+        });
+      } else { 
+        res.status(400).send({
+          error: 'invalid_request',
+          errors: errors
+        });
+      }
+  }
 });
 
 app.post(`/project/submit/projectname`, (req, res) => {
