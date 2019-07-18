@@ -8,27 +8,139 @@
       <title>Project Submission: </title>
     </head>
 
-    <body>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 
-      <div>
-        <h1>Ooo, a piece of <%= food %>.</h1>
+  <title>Project Submission: </title>
+
+  <style>
+    table {
+      font-family: arial, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    td,
+    th {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 5px;
+    }
+
+    tr:nth-child(even) {
+      background-color: #dddddd;
+    }
+
+    #styling {
+      float: none;
+      margin: 0 auto;
+      padding: 50px;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div class="text-center">
+    <h1>Project Submission Form</h1>
+  </div>
+
+  <div class="text-center">
+    <h3><%= projectName %></h3>
+  </div>
+
+  <div class="container col-sm-6" id="styling">
+    <form action="/project/submit/projectName" method="POST">
+      <div class="form-group">
+        <label>Enter Github URL</label>
+        <input type="url" class="form-control" placeholder="Enter github url here" name="github" required>
       </div>
 
-      <form action='/project/submit/projectname' method='POST'>
-        <label for='github' >enter your github url:</label>
-        <input id='github' name='github'>
-        <input type='submit'>
-      </form>
+      <div class="form-group">
+        <label for="exampleInputPassword1">Enter Heroku/Now URL</label>
+        <input type="url" class="form-control" placeholder="Enter heroku/now url here" name="heroku" required>
+      </div>
 
-      <% if(formData!=null){ %>    
-        <div>
-          <p>url: <%= formData.url %> </p>
-          <p>urlStatus: <%= formData.urlStatus %> </p>
-          <p>grade: <%= formData.grade %></p>
-        </div>
+
+      <% if(formData != null){ %>
+      <% if(formData.gitUrl.includes('github.com') && (formData.heroUrl.includes('.heroUrlapp.com') || formData.heroUrl.includes('now.sh'))){ %>
+      <div class="alert alert-success">
+        <strong>Congrats! your project was submitted successfully</strong>
+      </div>
+      <% } else{ %>
+      <div class="alert alert-danger">
+        <strong>Oops! something went wrong.</strong>
+      </div>
       <% } %>
 
+      <% } %>
 
-    </body>
+      <table>
+        <tr>
+          <td>
+            <p>Github URL: <% if (formData != null) { %>
+              <%= formData.gitUrl %>
+              <% } %>
+            </p>
+          </td>
+        </tr>
 
-  </html>
+        <tr>
+          <td>
+            <p>Heroku URL: <% if (formData != null) { %>
+              <%= formData.heroUrl %>
+              <% } %>
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <p>URL Status: <% if (formData != null) { %>
+              <%= formData.urlStatus %>
+              <% } %>
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <p>Grade: <% if (formData != null)  { %>
+              <%= formData.grade %>
+              <% } %>
+            </p>
+          </td>
+        </tr>
+      </table>
+      <br>
+
+
+      <% if(formData != null){ %>
+        <% if(formData.gitUrl.includes('github.com') && (formData.heroUrl.includes('.heroUrlapp.com') || formData.heroUrl.includes('now.sh'))){ %>
+            <button type="button" class="btn btn-primary">Done</button>
+        <% }else{ %>
+          <button type="submit" class="btn btn-primary">Submit</button> <button type="reset" value="reset"
+            class="btn btn-danger" id="change">Clear</button>
+        <% } %>
+      <% }else{ %>
+        <button type="submit" class="btn btn-primary">Submit</button> <button type="reset" value="reset"
+          class="btn btn-danger" id="change">Clear</button>
+      <% } %>
+
+    </form>
+  </div>
+
+  <script>
+
+    var result = $("body");
+    $('#change').click(function () {
+      result.load('/project/submit/home');
+    });
+
+  </script>
+</body>
+
+
+</html>
