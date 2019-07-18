@@ -75,7 +75,6 @@ app.post(`/project/submit/projectname`, (req, res) => {
           heroUrl: url.heroku,
           urlStatus: response.status,
           grade: 1,
-          comments: ""
         };
         res.render('submit', {projectName: 'candy', formData: grading});
       })
@@ -86,7 +85,6 @@ app.post(`/project/submit/projectname`, (req, res) => {
       heroUrl: url.heroku,
       urlStatus: 'Sorry, the Urls you provided are not valid.',
       grade: 0,
-      comments: ""
     };
     res.render('submit', {projectName: 'candy', formData: grading});
   }
