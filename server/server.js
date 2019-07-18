@@ -2,8 +2,10 @@ const express = require("express");
 const morgan = require("morgan");
 const bodyParser = require('body-parser');
 const routes = require("./routes");
+require('dotenv').config();
 const {check, validationResult}  = require('express-validator');
 const axios = require('axios');
+const { valid_oauth2_request } = require('./oauth2_validation');
 
 const app = express();
 
@@ -18,12 +20,44 @@ app.use( (req,res,next) => {
   next();
 });
 
-
 app.set('views', './views');
 app.set('view engine', 'ejs');
 
 app.get("/", (req, res) => {
   res.status(200).send(`Turn around ...Look at what you see...A slash route at.../project/submit/:projectName...Is where i'll be...`);
+});
+
+// Audience (aud):  <base url>   &&    Issuer is <base url>/oauth2/token
+app.post('/oauth2/token', (req, res) => {
+  const errors = valid_oauth2_request(req);
+  if (errors.length === 0) {  // no errors
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Pragma', 'no-cache');
+    res.status(200).send({
+      access_token: process.env.ACCESS_TOKEN,
+      expires_in: 600,      // 10 minutes
+      token_type: 'bearer',
+      state: req.state
+    });
+  } else {
+      if (errors.findIndex(e => e.includes('grant type invalid')) >= 0) {
+        res.status(400).send({
+          error: 'unsupported_grant_type',
+          errors: errors
+        });
+      } else if (errors.findIndex(e => e.includes('invalid')) >= 0) {
+        res.status(401).send({
+          error: 'invalid_client',
+          errors: errors
+        });
+      } else { 
+        res.status(400).send({
+          error: 'invalid_request',
+          errors: errors
+        });
+      }
+  }
 });
 
 app.get("/project/submit/:projectname", (req, res) => {
