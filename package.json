@@ -27,10 +27,12 @@
     "ims-lti": "^3.0.2",
     "joi": "^14.3.1",
     "morgan": "^1.9.1",
-    "nodemon": "^1.19.1"
+    "nodemon": "^1.19.1",
+    "qs": "^6.7.0"
   },
   "devDependencies": {
-    "supertest": "^4.0.2",
-    "chai": "^4.2.0"
+    "chai": "^4.2.0",
+    "dotenv": "^8.0.0",
+    "supertest": "^4.0.2"
   }
 }
