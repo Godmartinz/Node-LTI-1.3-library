@@ -80,19 +80,20 @@ app.get('/project/submit/:projectname', (req, res) => {
     }
   });
 
-// Audience (aud):  <base url>   &&    Issuer is <base url>/oauth2/token
 app.post('/oauth2/token', (req, res) => {
   const errors = valid_oauth2_request(req);
   if (errors.length === 0) {  // no errors
-    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Type', 'application/json;charset=UTF-8');
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('Pragma', 'no-cache');
-    res.status(200).send({
-      access_token: process.env.ACCESS_TOKEN,
-      expires_in: 600,      // 10 minutes
+    const payload = {
+      sub: process.env.CLIENT_ID,
+      expires_in: 3600,      // 1 hour per IMS spec
       token_type: 'bearer',
-      state: req.state
-    });
+      scope: 'https://purl/imsglobal.org/spec/lti/v1p3/scope/grading.all'
+    };
+    const jwt_payload = jwt.sign(payload, process.env.CLIENT_SECRET, { algorithm: 'RS256'});
+    res.status(200).send(jwt_payload);
   } else {
       if (errors.findIndex(e => e.includes('grant type invalid')) >= 0) {
         res.status(400).send({
@@ -111,6 +112,26 @@ app.post('/oauth2/token', (req, res) => {
         });
       }
   }
+});
+
+app.get('/project/submit/:projectname', (req, res) => {
+  const jwt_string = req.headers.authorization.split(' ')[1];
+  jwt.verify(jwt_string, process.env.CLIENT_PUBLIC, { algorithm: ['RS256']}, (err, decoded) => {
+    if (err) {
+      res.status(401).send('invalid token');
+    } else {
+      //const errors = launch_validation(req); 
+      const errors = [];
+      if (errors.length === 0) {
+        res.status(200).render('submit', {projectName: 'candy'});
+      } else {
+        res.status(400).send({
+          error: 'invalid_request',
+          error: errors
+        })
+      }
+    }
+  });
 });
 
 app.post(`/project/submit/projectname`, (req, res) => {
