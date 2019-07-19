@@ -46,16 +46,16 @@ Post should be 'application/json':
       title: <Introduction Assignment> }
 }
 ```
-* to launch the tool
 
 ## To run tests:
 ```
 npm test
 ```
 You will need to load the test data in your .env file for:
-CLIENT_ID
-CLIENT_SECRET
-CLIENT_PUBLIC
+* CLIENT_ID
+* CLIENT_SECRET
+* CLIENT_PUBLIC
+
 
 ### Contributors:
 * Argenis De Los Santos
