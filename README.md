@@ -5,12 +5,26 @@
 npm install
 ```
 
+
+## To run tests:
+```
+npm test
+```
+You will need to load the test data in your .env file for:
+* CLIENT_ID=client12345
+* CLIENT_SECRET=<Valid  Platform RSA Private Key>
+* CLIENT_PUBLIC=<Valid  Platform Public Key>
+
+
 ## To run:
 ```
 npm start
 ```
 
-The app will run on http://localhost:3000/ in your browser.  
+The app will run on http://localhost:3000/ in your browser.
+
+## Authorize tool launch:
+Clicking 'Get Token' button will:
 
 1. POST a properly formatted request to /oauth2/token
 
@@ -24,6 +38,9 @@ Post should be 'application/x-www-form-urlencoded' and in the format:
 ```
 If successful, you will receive a token authorizing your access to the Tool's API as a JWT.  You can verify the JWT with your client public key.
 
+
+## Launch tool:
+Clicking 'Launch Tool' button will:
 
 2. POST a properly formatted request to /project/submit/:projectname
 
@@ -47,14 +64,18 @@ Post should be 'application/json':
 }
 ```
 
-## To run tests:
-```
-npm test
-```
-You will need to load the test data in your .env file for:
-* CLIENT_ID
-* CLIENT_SECRET
-* CLIENT_PUBLIC
+3. Redirect the user to the tool's endpoint.
+
+## Tool Usage:
+When tool is launched, user will be redirected to a form where they can enter a Github URL and Heroku/Now URL.
+  -URLs should be formatted:
+    http://www.github.com/
+              OR
+    http://www.herokuapp.com  /  http://www.now.sh
+
+  - On submit, user will be shown a message:
+    - Success: Displays the submitted URLs, URL status code, and a Grade.
+    - Failuire: Displays an error message.
 
 
 ### Contributors:
