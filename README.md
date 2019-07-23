@@ -1,10 +1,12 @@
 # LTI 1.3 Compliant Library for External Tool Integration
 
-This Javascript-based Library allows an education provider to integrate an external Tool into their chosen Platform/Learning Management System (LMS), such as Moodle, Blackboard, Edgenuity, etc, without needing to understand the underlying Learning Tools Interoperability (LTI) standards (https://www.imsglobal.org/activity/learning-tools-interoperability). 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This Library supports the LTI 1.3 Core standards (https://www.imsglobal.org/spec/lti/v1p3).  It also provides limited support of the LTI Advantage Names and Roles Provisioning Services (https://www.imsglobal.org/spec/lti-nrps/v2p0/) and Assignment and Grade Services (https://www.imsglobal.org/spec/lti-ags/v2p0).
+This Javascript-based Library allows an education provider to integrate web-based external Tools into their chosen learning Platform, such as Moodle, Blackboard, Edgenuity, etc, without needing to understand the underlying Learning Tools Interoperability (LTI) standards (https://www.imsglobal.org/activity/learning-tools-interoperability). 
 
-This Library is being updated to fully support the LTI Advantage extensions (https://www.imsglobal.org/spec/lti/v1p3/impl) for Names/Roles, and Assignments/Grades.  At this time, LTI Advantage Deep Linking (https://www.imsglobal.org/spec/lti-dl/v2p0/) is not supported.
+This Library supports the LTI 1.3 Core standards (https://www.imsglobal.org/spec/lti/v1p3), which implements up-to-date privacy and security standards.  It also provides limited support of the LTI Advantage Names and Roles Provisioning Services (https://www.imsglobal.org/spec/lti-nrps/v2p0/) and Assignment and Grade Services (https://www.imsglobal.org/spec/lti-ags/v2p0).
+
+In the future, this Library will be updated to fully support the LTI Advantage extensions (https://www.imsglobal.org/spec/lti/v1p3/impl) for Names/Roles, and Assignments/Grades.  At this time, LTI Advantage Deep Linking (https://www.imsglobal.org/spec/lti-dl/v2p0/) is not supported.
 
 ## Overview
 
@@ -31,7 +33,7 @@ npm install
 
 ### 2. Setup Routes
 
-In the server/server.js file, add routes to launch your Tool
+In the server/server.js file, add routes to launch your Tool.
 
 
 ### 3. Register Platform with Tool
@@ -70,7 +72,7 @@ The Tool example will run on `http://localhost:3000/` in your browser.
 >   'client_secret': <your RSA Private Key/Secret, like was generated under Testing above>
 > }
 > ```
-> If successful, the example will display the token authorizing the Platform to have access to the Tool's API.  This token is secured as a JWT.  In this example, the Platform will be able to verify the JWT on their side with the public key.
+> If successful, the example will display the token authorizing the Platform to have access to the Tool's API.  This token is secured as a JWT, so the Platform will be able to verify the JWT on their side with the public key.
 > 
 > If you want to view the JSON object that is being passed through the JWT, copy the token and paste it into the 'JWT String box' on https://www.jsonwebtoken.io/.  This will enable you to view the JSON object on the Payload.
 
@@ -112,11 +114,11 @@ The Tool example will run on `http://localhost:3000/` in your browser.
 >     
 >     http://www.github.com/
 >               OR
->     http://www.herokuapp.com  /  http://www.now.sh
+>     http://www.herokuapp.com  or  http://www.now.sh
 > 
-> When the student clicks Submit, the student be shown their grade, unless the URLs are not properly formatted and/or the GitHub URL doesn't launch successfully.
+> If the URLs are not properly formatted and/or the GitHub URL doesn't launch successfully, the student will see an error message.  With a valid project, when the student clicks Submit, s/he will be shown the resulting grade.
 > 
-> When the student clicks Done, the Tool uses the Library to pass the grade back to the Platform.
+> Finally, when the student clicks Done, the Tool uses the Library to pass the grade back to the Platform.
 
 ---
 
@@ -124,9 +126,9 @@ The Tool example will run on `http://localhost:3000/` in your browser.
 
 The Tool example provides a test suite to verify the basic functionality of the Library.  
 
-The tests require the use of a .env file, which if you are new to Node is a a simple configuration text file that is used to pass customized variables into your application’s environment. You can use LMS Global's Reference Implementation Tool to generate keys (https://lti-ri.imsglobal.org/keygen/index.
+The tests require the use of a .env file, which if you are new to Node, is a a simple configuration text file that is used to pass customized variables into your application’s environment. 
 
-You will need to load the test data in your .env file for:
+You will need to load the test data in your .env file for the follwoing.  You can use LMS Global's Reference Implementation Tool to generate keys (https://lti-ri.imsglobal.org/keygen/index.
 * CLIENT_ID=client12345
 * CLIENT_SECRET=<RSA Private Key>
 * CLIENT_PUBLIC=<Public Key>
@@ -149,11 +151,11 @@ LTI - The IMS Learning Tools Interoperability specification allows Platforms to 
 
 LMS - Learning Management System.  Referred to as Platforms in this document.
 
-OAuth 2.0 - LTI 1.3 specifies the use of the OAuth 2.0 Client Credential Grant mechanism to secure web services between trusted systems.  This Library makes use of JSON Web Tokens, JWT, for the access tokens) (https://www.imsglobal.org/spec/security/v1p0) 
+OAuth 2.0 - LTI 1.3 specifies the use of the OAuth 2.0 Client Credential Grant mechanism to secure web services between trusted systems.  This Library makes use of JSON Web Tokens, JWT, for the access tokens. (https://www.imsglobal.org/spec/security/v1p0) 
 
-Platform - also referred to as the Tool Consumer or the Learning Management System (LMS).  Example are Moodle, Blackboard, Edgenuity, etc.
+Platform - previously referred to as the Tool Consumer is the Learning Management System (LMS) that the educational provider is using.  Examples are Moodle, Blackboard, Edgenuity, Canvas, Schoology, etc.
 
-Tool - also referred to as Tool Provider, this is the external Tool that contains educational material to include in a course.  For example, a quiz, specialized course content, or customized grading module.
+Tool - previously referred to as the Tool Provider, this is the external Tool that contains educational material to include in a course.  Tools can range from a single piece of content, for example a quiz, to an extensive interactive website featuring specialized course content.
 
 ---
 
