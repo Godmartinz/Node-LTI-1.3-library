@@ -4,7 +4,7 @@
   "description": "IMS-LTI 1.3 Tool Provider built in NodeJS",
   "main": "index.js",
   "scripts": {
-    "start": "node server/index.js",
+    "start": "nodemon server/index.js",
     "test": "mocha tests/*.spec.js --exit"
   },
   "repository": {
