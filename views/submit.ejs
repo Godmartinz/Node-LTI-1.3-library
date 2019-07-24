@@ -45,11 +45,30 @@
   </div>
 
   <div class="text-center">
-    <h3 id='projectName'><%= projectName %></h3>
+    <h3 id='projectName'>
+      <% if ((payload['https://purl.imsglobal.org/spec/lti/claim/context'] != null) && payload['https://purl.imsglobal.org/spec/lti/claim/context'].label != null) { %>
+        <%= payload['https://purl.imsglobal.org/spec/lti/claim/context'].label %>
+      <% } %>
+      <% if (payload['https://purl.imsglobal.org/spec/lti/claim/context'] != null && payload['https://purl.imsglobal.org/spec/lti/claim/context'].title != null) { %>
+        <%= payload['https://purl.imsglobal.org/spec/lti/claim/context'].title %>
+      <% } %>
+    </h3>
+    <h4>
+      <% if (payload.name != null) { %>
+        <%= payload.name %>
+      <% } else { %>
+        <% if (payload.given_name != null) { %>
+          <%= payload.given_name %>
+        <% } %>
+        <% if (payload.family_name != null) { %>
+          <%= payload.family_name %>
+        <% } %>
+      <% } %>
+    </h4>
   </div>
 
   <div class="container col-sm-6" id="styling">
-    <form method="POST" action="/project/grading/react100">
+    <form method="POST" action="/project/grading">
       <div class="form-group">
         <label>Enter Github URL</label>
         <input type="url" class="form-control" placeholder="Enter github url here" name="github" required>
@@ -63,7 +82,7 @@
       <hr />
       <h4 class="mt-5">Submission Status</h4>
 
-      <% if(formData != null && formData.grade != null){ %>
+      <% if (formData != null && formData.grade != null) { %>
       <div class="alert alert-success">
         <strong>Congrats! your project was submitted successfully</strong>
       </div>
@@ -112,14 +131,14 @@
       </table>
       <br>
 
-      <% if(formData != null){ %>
-        <% if(formData.grade != null){ %>
+      <% if (formData != null) { %>
+        <% if (formData.grade != null) { %>
             <button type="button" class="btn btn-primary">Done</button>
-        <% } else{ %>
+        <% } else { %>
           <button type="submit" class="btn btn-primary">Submit</button> 
           <button type="reset" value="reset" class="btn btn-danger" id="change">Clear</button>
         <% } %>
-      <% } else{ %>
+      <% } else { %>
         <button type="submit" class="btn btn-primary">Submit</button> 
         <button type="reset" value="reset" class="btn btn-danger" id="change">Clear</button>
       <% } %>
