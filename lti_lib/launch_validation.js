@@ -5,17 +5,10 @@ const jwt = require('jsonwebtoken');
  * @param req - HTTP request to validate
  * @returns an array, which if empty indicates 0 errors, otherwise, contains description of each error
  * 
- * The launch validator checks that all required fields to meet the LTI 1.3 standard are filled and the required fields are present, otherwise it will return a list of errors. 
+ * this validates all the the required fields as per LTI 1.3 standards in conjunction with the 0auth_validation before launch.
  * 
- * valid_launch_request should be added to the route block that tools would be located at.
- * 
- * keyValidator should be added to the the route block that the tools will be submitting at.
- * 
- * 
+ * keyValidator() should be called inside the route block that the project will be submitted.
  */
-
-
-
 function valid_launch_request(req) {
   let body = req.body;
   let errors = [];
@@ -152,12 +145,12 @@ function valid_launch_request(req) {
   } else {
     errors.push("Role missing");
   }
-  
   return errors;
 }
 
 //Validates that the authorization keys are present and filled.
-function keyValidator(req, res) {
+function launchTool(req, res) {
+  console.log(JSON.stringify(req.headers));
   const schema = Joi.object().keys({
     "https://purl.imsglobal.org/spec/lti/claim/message_type": Joi.string()
       .exist()
@@ -185,10 +178,8 @@ function keyValidator(req, res) {
     user_role: Joi.string().exist(),
     project_name: Joi.string().exist()
   });
-  //returns errors if any of the object keys are invalid, otherwise it will begin to validate a token
-  if (!schema.validate(req.body) ) {
+  if (!schema.validate(req) ) {
     res.status(422).json({ errors: errors.array() });
-
   } else {
     const jwt_string = req.headers.authorization.split(" ")[1];
     jwt.verify(
@@ -201,8 +192,7 @@ function keyValidator(req, res) {
         } else {
           const errors = valid_launch_request(req);
           if (errors.length === 0) {
-          return   res.send({ projectName: req.body.redirect_uri }) && res.redirect(req.body.project_name );
-
+            return res.send({ projectName: req.body.project_name }) && res.redirect(req.body.project_name);
           } else {
             return res.status(400).send({
               error: "invalid_request",
@@ -212,7 +202,13 @@ function keyValidator(req, res) {
         }
       }
     );
-  }
-}
+    }}
+// /* Redirects to another page based on the redirect URI. Still waiting to implement, need more info on what the LMS payload will be. */
+//   function targetRedirect(req, res){
+//     target_URI= req.body.redirect_uri
 
-module.exports = { valid_launch_request, keyValidator  };
+//     res.redirect(target_URI);
+//   }
+// }
+
+module.exports = { launchTool };
