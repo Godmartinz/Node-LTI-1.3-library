@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 
 
 /* The Token Maker creates a JSON web token in accordance with the LTI 1.3 standard and in conjunction with Oauth 2.0 validation. 
- the tokenMaker() should be added to the route block that handles the Oauth-validiation. */
+ the tokenMaker() should be called in route block that handles the Oauth token validiation. */
 
 function tokenMaker(errors, res) {
   
