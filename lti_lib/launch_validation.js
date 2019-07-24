@@ -101,6 +101,11 @@ function valid_launch_request(req) {
     errors.push('Role missing');
   }
 
+
+
+
+
+  
   return errors;
 }
 
