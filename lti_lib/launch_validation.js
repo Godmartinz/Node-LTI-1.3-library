@@ -1,5 +1,6 @@
 const Joi = require("@hapi/joi");
 const jwt = require('jsonwebtoken');
+
 /*
  * Validate LTI 1.3 Launch Request
  * @param req - HTTP request to validate
@@ -192,7 +193,7 @@ function launchTool(req, res) {
         } else {
           const errors = valid_launch_request(req);
           if (errors.length === 0) {
-            return res.send({ projectName: req.body.project_name }) && res.redirect(req.body.project_name);
+            return res.send({ projectName: req.body.project_name } && res.redirect(req.body.project_name));
           } else {
             return res.status(400).send({
               error: "invalid_request",
