@@ -149,7 +149,7 @@ function valid_launch_request(req) {
 }
 
 //Validates that the authorization keys are present and filled.
-function keyValidator(req, res) {
+function launchTool(req, res) {
   console.log(JSON.stringify(req.headers));
   const schema = Joi.object().keys({
     "https://purl.imsglobal.org/spec/lti/claim/message_type": Joi.string()
@@ -211,4 +211,4 @@ function keyValidator(req, res) {
 //   }
 // }
 
-module.exports = { keyValidator};
+module.exports = { launchTool };
