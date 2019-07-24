@@ -2,7 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 require("dotenv").config();
 const { valid_oauth2_request } = require("../lti_lib/oauth2_validation");
-const { keyValidator, targetRedirect } = require("../lti_lib/launch_validation");
+const { keyValidator } = require("../lti_lib/launch_validation");
 const { tokenMaker } = require("../lti_lib/token_generator");
 const { grade_project } = require("../tool/grading_tool");
 

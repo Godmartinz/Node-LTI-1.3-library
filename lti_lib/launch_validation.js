@@ -202,13 +202,13 @@ function keyValidator(req, res) {
         }
       }
     );
-  }
-/* Redirects to another page based on the redirect URI. Still waiting to implement, need more info on what the LMS payload will be. */
-  function targetRedirect(req, res){
-    target_URI= req.body.redirect_uri
+    }}
+// /* Redirects to another page based on the redirect URI. Still waiting to implement, need more info on what the LMS payload will be. */
+//   function targetRedirect(req, res){
+//     target_URI= req.body.redirect_uri
 
-    res.redirect(target_URI);
-  }
-}
+//     res.redirect(target_URI);
+//   }
+// }
 
-module.exports = { keyValidator, targetRedirect  };
+module.exports = { keyValidator};
