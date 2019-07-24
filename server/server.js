@@ -6,6 +6,7 @@ const { valid_oauth2_request } = require("../lti_lib/oauth2_validation");
 const { launchTool } = require("../lti_lib/launch_validation");
 const { tokenMaker } = require("../lti_lib/token_generator");
 const { grade_project } = require("../tool/grading_tool");
+const mongoose = require('mongoose');
 
 const app = express();
 
@@ -32,6 +33,16 @@ app.use( (req,res,next) => {
 
 app.set("views", "./views");
 app.set("view engine", "ejs");
+
+mongoose.connect('mongodb://localhost:27017/TESTLTI', {
+  useNewUrlParser: true},
+  (err) => {
+    if(err) {
+      return console.log(err);
+    }
+  }
+);
+mongoose.Promise = Promise;
 
 app.get("/", (req, res) => {
   res.render("index");
