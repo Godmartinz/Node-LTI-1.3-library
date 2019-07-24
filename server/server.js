@@ -6,6 +6,7 @@ const {check, validationResult}  = require('express-validator');
 const { valid_oauth2_request } = require('../lti_lib/oauth2_validation');
 const { valid_launch_request } = require('../lti_lib/launch_validation');
 const { grade_project } = require('../tool/grading_tool');
+const mongoose = require('mongoose');
 
 const app = express();
 
@@ -23,12 +24,23 @@ app.use( (req,res,next) => {
 app.set('views', './views');
 app.set('view engine', 'ejs');
 
+mongoose.connect('mongodb://localhost:27017/TESTLTI', {
+  useNewUrlParser: true},
+  (err) => {
+    if(err) {
+      return console.log(err);
+    }
+  }
+);
+mongoose.Promise = Promise;
+
 app.get('/', (req, res) => {
   // res.status(200).send(`Turn around ...Look at what you see...A slash route at.../project/submit/:projectName...Is where i'll be...`);
   res.render('index');
 });
 
 app.post('/oauth2/token', (req, res) => {
+  console.log('req.body: ', req.body);
   const errors = valid_oauth2_request(req);
   if (errors.length === 0) {  // no errors
     res.setHeader('Content-Type', 'application/json;charset=UTF-8');
@@ -40,7 +52,9 @@ app.post('/oauth2/token', (req, res) => {
       token_type: 'bearer',
       scope: 'https://purl/imsglobal.org/spec/lti/v1p3/scope/grading.all'
     };
+    console.log(payload)
     const jwt_payload = jwt.sign(payload, process.env.CLIENT_SECRET, { algorithm: 'RS256'});
+    console.log(jwt_payload)
     res.status(200).send({jwt: jwt_payload}); 
   } else {
       if (errors.findIndex(e => e.includes('grant type invalid')) >= 0) {
