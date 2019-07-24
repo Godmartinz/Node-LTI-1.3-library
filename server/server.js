@@ -29,9 +29,10 @@ app.get("/", (req, res) => {
 app.post("/oauth2/token", (req, res) => {
   var errors = valid_oauth2_request(req);
   tokenMaker(errors, res);
+  
 });
 
-app.post("/course/module/submit/:project", (req, res) => {
+app.post("/project/submit/:project", (req, res) => {
   keyValidator(req, res);
 });
 
