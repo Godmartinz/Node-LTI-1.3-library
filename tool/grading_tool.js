@@ -8,20 +8,21 @@ async function grade_project(req) {
   };
 
   if ( url.github.includes('github.com') && (url.heroku.includes('.herokuapp.com') || url.heroku.includes('now.sh'))) {
-      let response = await test_site(url.github);
-      if (response.status === 200) {
+    let response = await axios.get(url.github);
+
+    if (response.status === 200) {
+      grading = {
+        ...grading,
+        urlStatus: response.status,
+        grade: 1
+      }
+      } else {
         grading = {
           ...grading,
-          urlStatus: response.status,
-          grade: 1
-        }
-       } else {
-          grading = {
-            ...grading,
-            urlStatus: 'The URLs do not launch correctly',
-            grade: null
-        }  
-      }
+          urlStatus: 'The URLs do not launch correctly',
+          grade: null
+      }  
+    }
   } else {
     grading = {
       ...grading,
@@ -31,21 +32,6 @@ async function grade_project(req) {
   }
 
   return grading;
-}
-
-function test_site(url) {
-  return new Promise(function (resolve, reject) {
-    axios.get(url)
-    .then( response => {
-      // grading = {
-      //   gitUrl: url.github,
-      //   heroUrl: url.heroku,
-      //   urlStatus: response.status,
-      //   grade: 1
-      // }
-      resolve(response)
-      });    
-  });
 }
 
 module.exports = { grade_project };

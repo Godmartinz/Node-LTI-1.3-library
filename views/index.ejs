@@ -4,14 +4,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <title>Project Submission</title>
+  <title>Pied Piper LTI1.3 Example</title>
 </head>
 
 <body class='bg-light'>
   <div class='text-center my-5'>
     <h1 class='mb-5'>Test LTI Tool</h1>
     <p>See how the Pied Piper LTI Library works.</p>
-    <p>A Grader Tool is used as an example Tool Provider.</p>
+    <p>A Grader Tool is used as an example Tool.</p>
     <button id='get-token' class='mr-5 mt-5 bg-info p-2'>Get Token</button>
     <button id='launch-tool' class='bg-info p-2'>Launch Tool</button>
   </div>
@@ -45,7 +45,7 @@
   });
 
   document.getElementById('launch-tool').addEventListener('click', async _ => {
-    fetch('/FSJS/react100/submit/Weather_app', {
+    fetch('http://localhost:3000/project/submit', {
       method: 'post',
       headers: {
           Authorization: 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbGllbnQxMjM0NSIsImV4cGlyZXNfaW4iOjM2MDAsInRva2VuX3R5cGUiOiJiZWFyZXIiLCJzY29wZSI6Imh0dHBzOi8vcHVybC9pbXNnbG9iYWwub3JnL3NwZWMvbHRpL3YxcDMvc2NvcGUvZ3JhZGluZy5hbGwiLCJpYXQiOjE1NjM1MDQ2Mzl9.BhW9-m_jq7RgCU3MqN5rfHCQmvXenbmUUTGGrNQ0lyllbSjaC5Kgfs7TudQBhHAH4aQh7ITVrw0o6LCn94k41hsmZz6F2NyLJikMsnCu658_0X9UnXro3egiR-IKcIMyJ6y3F8AdVeB_GRLyjg8xThdS5oXYg1phmdkrhsTNLuWViyBex7lXVgypruABft9fNzlXxj5Nh8BUlH9_rY5Fxqb3HLCf1ZmKhPhvDjjYKj06ja4q_tI0wdIvcBIRvSffe9zWAko8iRQ1IeB_7MOLX9CBSa4JSsUfFnBq7GYCX5m9qjp_Bs9knSCaNhvriGyz3nA97sGOkg8M-3nwu4u_wQ',
@@ -67,23 +67,31 @@
           { id: '200d101f-2c14-434a-a0f3-57c2a42369fd',
             description: 'Assignment to introduce who you are',
             title: 'Introduction Assignment' },
+        'https://purl.imsglobal.org/spec/lti/claim/context': {
+          id: 'random-id-with-cha.dfokasdf',
+          label: 'react100',
+          title: 'React for Beginners',
+          type: [ 'http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering' ]
+        },
+        "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint": {
+          scope: ["https://purl.imsglobal.org/spec/lti-ags/scope/score"],
+          "lineitems": "https://www.myuniv.example.com/2344/lineitems/",
+          "lineitem": "https://www.myuniv.example.com/2344/lineitems/1234/lineitem"
+        },
+        given_name: 'Joe',
+        family_name: 'Schmoo',
+        name: 'Joe Schmoo',    
         'client_id': 'client12345',
         'redirect_uri': 'weather_app',
         'response_type': 'response type',
-        'scope': 'scope',
-        'custom_project_name': 'weather_app',
-        'project_name': 'react200',
-        'user_id': 'user id',
-        'custom_user_role': 'user role',
-        'user_role': 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner'
+        'scope': 'scope'
         })
       })
       .then(function(response) {
         return response.json();
       })
       .then(res => {
-        console.log('Completed!', res);
-        window.location.href = "/project/submit/" + res.projectName; 
+        window.location.href = "/project/submit"; 
       })
       .catch(err => {
         console.error(`Error: ${err}`);

@@ -5,9 +5,9 @@ const jwt = require('jsonwebtoken');
  * @param req - HTTP request to validate
  * @returns an array, which if empty indicates 0 errors, otherwise, contains description of each error
  * 
- * this validates all the the required fields as per LTI 1.3 standards in conjunction with the 0auth_validation before launch.
+ * this validates all the the required fields as per LTI 1.3 standards in conjunction with the OAuth_validation before launch.
  * 
- * keyValidator() should be called inside the route block that the project will be submitted.
+ * launchTool() should be called inside the route block that the project will be submitted.
  */
 function valid_launch_request(req) {
   let body = req.body;
@@ -65,7 +65,7 @@ function valid_launch_request(req) {
 
   // Check the Deployment ID.  For a given client_id, the deployment_id is a stable locally unique
   // identifier within the iss (Issuer).
-  // TODO:  check actual value once we have real data
+  // TODO:  check actual value once we have registration data
   if (
     body.hasOwnProperty(
       "https://purl.imsglobal.org/spec/lti/claim/deployment_id"
@@ -82,7 +82,7 @@ function valid_launch_request(req) {
   }
 
   // Check Target Link URI - MUST be the same value as the target_link_uri passed by the platform in the OIDC third party initiated login request.
-  // TODO:  check actual value once we have real data
+  // TODO:  check actual value once we have registration data
   if (
     body.hasOwnProperty(
       "https://purl.imsglobal.org/spec/lti/claim/tool_platform"
@@ -101,7 +101,7 @@ function valid_launch_request(req) {
   }
 
   // Check a resource link ID exists
-  // TODO:  check actual value once we have real data
+  // TODO:  check actual value once we have registration data
   if (
     body.hasOwnProperty(
       "https://purl.imsglobal.org/spec/lti/claim/resource_link"
@@ -121,11 +121,10 @@ function valid_launch_request(req) {
   }
 
   // Check sub exists for OIDC request, we do not allow Anonymous requests
-  // TODO: check actual value once we have real data
-  // TODO:  allow Anonymous requests
-  if (body.hasOwnProperty("sub")) {
-    if (body["sub"].length > 255) {
-      errors.push("Sub invalid");
+  // TODO: check actual value once we have user data
+  if (body.hasOwnProperty('sub')) {
+    if (body['sub'].length > 255) {
+      errors.push('Sub invalid');
     }
   } else {
     errors.push("Sub missing");
@@ -145,12 +144,55 @@ function valid_launch_request(req) {
   } else {
     errors.push("Role missing");
   }
+
+  // Context is optional, but if present, check validity of those provided.
+  // The Context type should be 'http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering'
+  if (body.hasOwnProperty('https://purl.imsglobal.org/spec/lti/claim/context')) {
+    if (!body['https://purl.imsglobal.org/spec/lti/claim/context'].hasOwnProperty('label') &&
+      !body['https://purl.imsglobal.org/spec/lti/claim/context'].hasOwnProperty('title') ) {
+        errors.push('Context invalid: does not contain label OR title');
+    }
+    if (body['https://purl.imsglobal.org/spec/lti/claim/context'].hasOwnProperty('type')) {
+      if (!body['https://purl.imsglobal.org/spec/lti/claim/context'].type.includes('http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering')) {
+        errors.push('Context invalid: type invalid');
+      }
+    } else {
+      errors.push('Context type missing');
+    }
+  }    
+
+  // User name information is optional, but if present, check validity of what is provided.
+  if (body.hasOwnProperty('given_name') && typeof body['given_name'] !== 'string') {
+    errors.push('Name information invalid');
+  }
+  if (body.hasOwnProperty('family_name') && typeof body['family_name'] !== 'string') {
+    errors.push('Name information invalid');
+  }
+  if (body.hasOwnProperty('name') && typeof body['name'] !== 'string') {
+    errors.push('Name information invalid');
+  }
+
+  // Returning scores is optional, but if requested, check validity of what is provided.
+  if (body.hasOwnProperty('https://purl.imsglobal.org/spec/lti-ags/claim/endpoint')) {
+    if (!body['https://purl.imsglobal.org/spec/lti-ags/claim/endpoint'].hasOwnProperty('scope') || 
+      body['https://purl.imsglobal.org/spec/lti-ags/claim/endpoint'].scope.length === 0) {
+        errors.push('Score setup invalid');
+    }
+    if (!body['https://purl.imsglobal.org/spec/lti-ags/claim/endpoint'].hasOwnProperty('lineitems') ||
+      typeof body['https://purl.imsglobal.org/spec/lti-ags/claim/endpoint'].lineitems !== 'string') {
+        errors.push('Score setup invalid');
+    }
+    if (!body['https://purl.imsglobal.org/spec/lti-ags/claim/endpoint'].hasOwnProperty('lineitem') ||
+      typeof body['https://purl.imsglobal.org/spec/lti-ags/claim/endpoint'].lineitem !== 'string') {
+        errors.push('Score setup invalid');
+    }
+  }
+
   return errors;
 }
 
 //Validates that the authorization keys are present and filled.
 function launchTool(req, res) {
-  console.log(JSON.stringify(req.headers));
   const schema = Joi.object().keys({
     "https://purl.imsglobal.org/spec/lti/claim/message_type": Joi.string()
       .exist()
@@ -171,12 +213,7 @@ function launchTool(req, res) {
     "https://purl.imsglobal.org/spec/lti/claim/roles": Joi.exist().required(),
     redirect_uri: Joi.exist().required(),
     response_type: Joi.string().exist(),
-    scope: Joi.string().exist(),
-    custom_user_role: Joi.string().exist(),
-    custom_project_name: Joi.string().exist(),
-    user_id: Joi.string().exist(),
-    user_role: Joi.string().exist(),
-    project_name: Joi.string().exist()
+    scope: Joi.string().exist()
   });
   if (!schema.validate(req) ) {
     res.status(422).json({ errors: errors.array() });
@@ -192,7 +229,7 @@ function launchTool(req, res) {
         } else {
           const errors = valid_launch_request(req);
           if (errors.length === 0) {
-            return res.send({ projectName: req.body.project_name }) && res.redirect(req.body.project_name);
+            return res.send({ payload: req.session.payload });// && res.redirect(req.body.project_name));
           } else {
             return res.status(400).send({
               error: "invalid_request",
@@ -211,4 +248,4 @@ function launchTool(req, res) {
 //   }
 // }
 
-module.exports = { launchTool };
+module.exports = { launchTool, valid_launch_request };
