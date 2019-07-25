@@ -230,7 +230,11 @@ function launchTool(req, res) {
         } else {
           const errors = valid_launch_request(req);
           if (errors.length === 0) {
+<<<<<<< HEAD
             return res.send({ payload: req.session.payload });// && res.redirect(req.body.project_name));
+=======
+            return res.send({ projectName: req.body.project_name } && res.redirect(req.body.project_name));
+>>>>>>> 37b2eabcd03a949db96bdd8fa3313b2182fbb655
           } else {
             return res.status(400).send({
               error: "invalid_request",
