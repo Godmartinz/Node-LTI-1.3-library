@@ -7,6 +7,8 @@ const { launchTool } = require("../lti_lib/launch_validation");
 const { tokenMaker } = require("../lti_lib/token_generator");
 const { grade_project } = require("../tool/grading_tool");
 const { keyGenerator } = require('../lti_lib/keyGenerator');
+const { grading_grade } = require("../lti_lib/student_score");
+
 const app = express();
 
 app.use(morgan("dev"));
@@ -61,11 +63,13 @@ app.get("/project/submit", (req, res) => {
 app.post(`/project/grading`, (req, res) => {
   grade_project(req)
     .then(grading => {
+      grading_grade(grading.grade, req.session.payload)
       res.render("submit", {
         payload: req.session.payload, 
         formData: grading
       });
     });
 });
+
 
 module.exports = app;
