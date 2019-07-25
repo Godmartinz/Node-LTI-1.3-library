@@ -40,8 +40,7 @@ app.get("/", (req, res) => {
 app.post("/oauth2/token", (req, res) => {
   var errors = valid_oauth2_request(req);
   tokenMaker(errors, res);
-  var keys = generate();
-  console.log(keys);
+  
 });
 
 app.post("/project/submit", (req, res) => {
