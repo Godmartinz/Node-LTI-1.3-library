@@ -1,5 +1,6 @@
 const Joi = require("@hapi/joi");
 const jwt = require('jsonwebtoken');
+
 /*
  * Validate LTI 1.3 Launch Request
  * @param req - HTTP request to validate

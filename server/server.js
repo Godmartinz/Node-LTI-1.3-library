@@ -6,7 +6,7 @@ const { valid_oauth2_request } = require("../lti_lib/oauth2_validation");
 const { launchTool } = require("../lti_lib/launch_validation");
 const { tokenMaker } = require("../lti_lib/token_generator");
 const { grade_project } = require("../tool/grading_tool");
-
+const { keyGenerator } = require('../lti_lib/keyGenerator');
 const app = express();
 
 app.use(morgan("dev"));
@@ -39,7 +39,8 @@ app.get("/", (req, res) => {
 
 app.post("/oauth2/token", (req, res) => {
   var errors = valid_oauth2_request(req);
-  tokenMaker(errors, res);  
+  tokenMaker(errors, res);
+  
 });
 
 app.post("/project/submit", (req, res) => {
@@ -51,7 +52,10 @@ app.get("/project/submit", (req, res) => {
   res.render("submit", {
     payload: req.session.payload, 
     formData: req.body.formData
-  });
+  }
+  );
+ 
+  
 });
 
 app.post(`/project/grading`, (req, res) => {
