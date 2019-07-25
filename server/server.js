@@ -54,7 +54,7 @@ app.get("/project/submit", (req, res) => {
     formData: req.body.formData
   }
   );
-  console.log(keyGenerator());
+ 
   
 });
 
