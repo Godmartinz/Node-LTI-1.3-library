@@ -37,15 +37,8 @@ function valid_launch_request(req) {
   }
 
   // Check the LTI message type
-  if (
-    body.hasOwnProperty(
-      "https://purl.imsglobal.org/spec/lti/claim/message_type"
-    )
-  ) {
-    if (
-      body["https://purl.imsglobal.org/spec/lti/claim/message_type"] !==
-      "LtiResourceLinkRequest"
-    ) {
+  if (body.hasOwnProperty("https://purl.imsglobal.org/spec/lti/claim/message_type")) {
+    if (body["https://purl.imsglobal.org/spec/lti/claim/message_type"] !== "LtiResourceLinkRequest") {
       errors.push("LTI message type invalid");
     }
   } else {
@@ -53,9 +46,7 @@ function valid_launch_request(req) {
   }
 
   // Check the LTI version
-  if (
-    body.hasOwnProperty("https://purl.imsglobal.org/spec/lti/claim/version")
-  ) {
+  if (body.hasOwnProperty("https://purl.imsglobal.org/spec/lti/claim/version")) {
     if (body["https://purl.imsglobal.org/spec/lti/claim/version"] !== "1.3.0") {
       errors.push("LTI Version invalid");
     }
@@ -63,18 +54,72 @@ function valid_launch_request(req) {
     errors.push("LTI Version missing");
   }
 
+  //Check the Issuer
+  if (body.hasOwnProperty('iss')) {
+    if (body.iss !== req.session.payload.iss) {
+      errors.push("Issuer invalid");
+    }
+  } else {
+    errors.push("Issuer missing");
+  }
+
+  //Check the Audience matches Tool's Client ID.  Note Audience can be an array or a single string
+  //If multiple Audiences are present, must all check that the Authorized Party is present and valid.
+  if (body.hasOwnProperty('aud')) {
+    if (typeof body.aud === 'array' && !body.aud.includes(process.env.CLIENT_ID &&
+      body.hasOwnProperty('azp') && !body.azp !== process.env.CLIENT_ID) ||
+      body.aud !== process.env.CLIENT_ID) {
+      errors.push("Audience invalid");
+    }
+  } else {
+    errors.push("Audience missing");
+  }
+
+  //If present, check the security Algorithm is RS256
+  if (body.hasOwnProperty('alg')) {
+    if (body.alg !== 'RS256') {
+      errors.push("Algorithm invalid");
+    }
+  }
+
+  //Check that the Token has not passed its Expiration time
+  if (body.hasOwnProperty('exp')) {
+    if (Date.now() >= body.exp) {
+      errors.push("Expiration invalid");
+    }
+  } else {
+    errors.push("Expiration missing");
+  }
+
+  //Check that the Token's Issued At time is with the past 1 hour (3600 seconds)
+  if (body.hasOwnProperty('iat')) {
+    if (Date.now() - 3600 >= body.iat) {
+      errors.push("Issued At invalid");
+    }
+  } else {
+    errors.push("Issued At missing");
+  }
+
+  //Check that the Nonce is valid to mitigate replay attacks. The nonce value is a case-sensitive string and cannot be 
+  //used more than once within a Tool-specified time frame.
+  //TODO:  need cleanup function to remove old nonce values so that we can check timeframe.
+  if (body.hasOwnProperty('nonce')) {
+    if (!req.session.hasOwnProperty('nonce_list')) {
+      req.session.nonce_list = [body.nonce];
+    } else if (req.session.nonce_list.includes(body.nonce)) {
+      errors.push("Nonce invalid");
+    } else {
+      req.session.nonce.push(body.nonce);
+    }
+  } else {
+    errors.push("Nonce missing");
+  }
+
   // Check the Deployment ID.  For a given client_id, the deployment_id is a stable locally unique
   // identifier within the iss (Issuer).
   // TODO:  check actual value once we have registration data
-  if (
-    body.hasOwnProperty(
-      "https://purl.imsglobal.org/spec/lti/claim/deployment_id"
-    )
-  ) {
-    if (
-      body["https://purl.imsglobal.org/spec/lti/claim/deployment_id"].length >
-      255
-    ) {
+  if (body.hasOwnProperty("https://purl.imsglobal.org/spec/lti/claim/deployment_id")) {
+    if (body["https://purl.imsglobal.org/spec/lti/claim/deployment_id"].length > 255) {
       errors.push("Deployment ID invalid");
     }
   } else {
@@ -83,17 +128,9 @@ function valid_launch_request(req) {
 
   // Check Target Link URI - MUST be the same value as the target_link_uri passed by the platform in the OIDC third party initiated login request.
   // TODO:  check actual value once we have registration data
-  if (
-    body.hasOwnProperty(
-      "https://purl.imsglobal.org/spec/lti/claim/tool_platform"
-    ) &&
-    body[
-      "https://purl.imsglobal.org/spec/lti/claim/tool_platform"
-    ].hasOwnProperty("url")
-  ) {
-    if (
-      body["https://purl.imsglobal.org/spec/lti/claim/tool_platform"].url === ""
-    ) {
+  if (body.hasOwnProperty("https://purl.imsglobal.org/spec/lti/claim/tool_platform") &&
+    body["https://purl.imsglobal.org/spec/lti/claim/tool_platform"].hasOwnProperty("url")) {
+    if (body["https://purl.imsglobal.org/spec/lti/claim/tool_platform"].url === "") {
       errors.push("Target Link URI invalid");
     }
   } else {
@@ -102,18 +139,9 @@ function valid_launch_request(req) {
 
   // Check a resource link ID exists
   // TODO:  check actual value once we have registration data
-  if (
-    body.hasOwnProperty(
-      "https://purl.imsglobal.org/spec/lti/claim/resource_link"
-    ) &&
-    body[
-      "https://purl.imsglobal.org/spec/lti/claim/resource_link"
-    ].hasOwnProperty("id")
-  ) {
-    if (
-      body["https://purl.imsglobal.org/spec/lti/claim/resource_link"].id
-        .length > 255
-    ) {
+  if (body.hasOwnProperty("https://purl.imsglobal.org/spec/lti/claim/resource_link") &&
+    body["https://purl.imsglobal.org/spec/lti/claim/resource_link"].hasOwnProperty("id")) {
+    if (body["https://purl.imsglobal.org/spec/lti/claim/resource_link"].id.length > 255) {
       errors.push("Resource Link invalid");
     }
   } else {
@@ -121,7 +149,7 @@ function valid_launch_request(req) {
   }
 
   // Check sub exists for OIDC request, we do not allow Anonymous requests
-  // TODO: check actual value once we have user data
+  // TODO: check actual value once we store user data
   if (body.hasOwnProperty('sub')) {
     if (body['sub'].length > 255) {
       errors.push('Sub invalid');

@@ -4,20 +4,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <title>Pied Piper LTI1.3 Example</title>
+  <title>Pied Piper LTI1.3 Library Example</title>
 </head>
 
 <body class='bg-light'>
   <div class='text-center my-5'>
-    <h1 class='mb-5'>Test LTI Tool</h1>
-    <p>See how the Pied Piper LTI Library works.</p>
-    <p>A Grader Tool is used as an example Tool.</p>
-    <button id='get-token' class='mr-5 mt-5 bg-info p-2'>Get Token</button>
-    <button id='launch-tool' class='bg-info p-2'>Launch Tool</button>
+    <h1 class='mb-5'>LTI 1.3 Library Usage Example</h1>
+    <h4 class="mb-5">See the Pied Piper LTI 1.3 Library in action. A Grader Module is used as the Tool example.</h4>
+    <p>1) When a student clicks a link in their course, their LMS initiates an OIDC login to the Tool, simulate this by clicking:
+    <button id='init-login' class='bg-success p-2 border rounded'>Initiate Login from LMS</button></p>
+    <div class='text-center card my-5 mx-5'>
+        <h6 class='card-header border-success'>Library Provided Login Response</h6>
+        <code id='oidc'>Press 'Initiate Login' to mimic a student clicking a link in the LMS</code>
+    </div>
+    <p>2) Based on above Login Response, the LMS will request that the Tool be launched, simulate this by clicking:
+    <button id='launch-tool' class='bg-success p-2 rounded'>Launch Tool</button></p>
   </div>
   <hr />
-  <div class='text-center card mt-5 mx-5'>
-      <h4 class='card-header bg-info'>Your Token</h4>
+  <div class='text-center'>
+      <p>3) The Library supports OAuth 2.0, generate a JSON Web Token by clicking:
+      <button id='get-token' class='mt-5 bg-warning p-2 rounded'>Get Token</button></p>
+  </div>
+  <div class='text-center card mx-5 my-5'>
+      <h6 class='card-header border-warning'>Your Token</h6>
       <p id='token'>Press 'Get Token' to generate a token!</p>
   </div>
 </body>
@@ -29,7 +38,7 @@
       'headers': { 'content-type': 'application/json' },
       'body': JSON.stringify({
         'grant_type': 'client_credentials',
-        'client_id': 'client12345',
+        'client_id': 'UbmzixiGkT1IkTp',
         'client_secret': '-----BEGIN RSA PRIVATE KEY-----\nMIIEpQIBAAKCAQEAy5CSU1VCiTdrRJnYNXoO91NE5NZYr1tyjsbvghaoabyzm4D9sp40QHReFb1OBZZZAwJYc9o+LRYU83/o5mDwlzyoYpz63wzNbXLF6kYK3JqP93mMXKJAs8q1EThuZCqc4RZAFI/QhMmqovLpKnEHSl8XPgxZOch2vQa14+3XaZdAgbUxfT6x08mFg71X/oNhNxhShiSLJ6xtKxC4+IDtAOlveIdvlfC50LVcMBbZahSo+j/MBVxdDDgTnMpxM3NsI+9aib9uzBjR4Lf43+OCrEOabg9nQbCZ2F2SAr/2+Ubl3ZJe/US4jkhfTbSClQZuSVNmNM+lMGxgXsZiCbzf1QIDAQABAoIBAQCQJRxoY/xMe/C6UBI4s+i7G7yyKlH8Qk4ZaicZQAAbd6LbH3kGLV6ksYIZ9MW10SPQrK2Dw+u5M2S8lDuQPt6+yRYXVj+TCFbDBL2+ycBRPCVrwScyRTZ52bVjr0kEJuSVwpK3vKqUDNWGs2mGQyk9cZ5cspPQBfKGoaTU9ItP2aXQzMY/+KLl46gmu5SK2igEaNIsNi1k41yRw7Sa7RDIH9jdWHlcl7WKxjHlIv21E9p2RUH8vqvNeH8joVH3IyS1w5F6mxaQrHjRp9RlXAkrIrDttn7bJ3jE55AxgvoYC8P3tV+wq/uqCJE+smfkH/umi2CPHzE0OMyQB7n9REh1AoGBAPKE9yZChjOPsf0cTQwnbZEIMZV4K3r+xYDV2kDa1NfEFooo9jsg34n/OMyC6xTgGYE98/10id/unAMNsLlX4PAelc3doBNRUt/bVFoNVHaw2JsghJ6qXm8Uj8rQgcXVOMhXoAQusUOyeL+2PyBhPt193EpNqYpKARx0Zi3waG7bAoGBANbhSLAAGpvaZPulLJ0pI1AF2sf+UifCNFOwByRS3PzPVKWzNU8EuDTUfpUCTQKuU1qmu+jx9moBi8bhkXh7kGOZqv95L7UATZ/Ql/F5S53oH1E6+iEPR2vn83XNHXzCeHuPED2MMugL85KCweMvG5v9fOf6z4ovknR+dOl5FnMPAoGBAKUKyAdJjnrYd5CBCg4TZwUkRloqBa0WZOJgpr8sLV0JHS244pkqrfYDsmu7TLBQMgs6VilOfeXfRFzvnC0GGRZQOjJ3eNCsr3GYmbcPC0Qa5c3sO1SfLNT7cT/c1fQEPzhYKZWvEQO5GWOeaydmBppFZP1MDO0Hn+n1bPQmf2uxAoGBAK0Dd6M+ci5LCkQUGnfwR56HGEEvZLbeh4NamGWG0qg7x8wjHykgg7EF52XTFG60LikvVt2Y9O8lj4Xy2U5JL1kCwcwxp1f1horHSZAEOf5Kh+y/r+YuhzM676xKGxP5AUl7R3hHCjYMaXHuFm713yUaVRfzumdpJmLl7vyNoqXBAoGATG1CDbTdDX/9Pq7RI34by/16IKropqYeb8rWINtp08sIqGYo68EGohP5SDbeyP12pG4idV+6IsY8twv5bz/uhG/HWXQOeGWea8d2lcxQnfirlOVkfdux7CJisdFX4ANcwKNGWrvreFwRch44ZjnT7O4vlQ+ETzb4KXiHFmvjY9A=\n-----END RSA PRIVATE KEY-----'
       })
     })
@@ -38,6 +47,28 @@
     })
     .then(res => {
       document.getElementById('token').innerHTML = res.jwt;
+    })
+    .catch(err => {
+      console.error(`Error: ${err}`);
+    });
+  });
+
+  document.getElementById('init-login').addEventListener('click', async _ => {
+    fetch('http://localhost:3000/oidc', {
+      'method': 'post',
+      'headers': { 'content-type': 'application/json' },
+      'body': JSON.stringify({ 
+        iss: 'https://www.sandiegocode.school',
+        target_link_uri: 'http://localhost:3000/project/submit',
+        login_hint: '9',
+        lti_message_hint: '377' 
+      })
+    })
+    .then(function(response) {
+      return response.json();
+    })
+    .then(res => {
+      document.getElementById('oidc').innerHTML = JSON.stringify(res, null, '\t');
     })
     .catch(err => {
       console.error(`Error: ${err}`);
@@ -81,7 +112,7 @@
         given_name: 'Joe',
         family_name: 'Schmoo',
         name: 'Joe Schmoo',    
-        'client_id': 'client12345',
+        'client_id': 'UbmzixiGkT1IkTp',
         'redirect_uri': 'redirect uri',
         'response_type': 'response type',
         'scope': 'scope'
