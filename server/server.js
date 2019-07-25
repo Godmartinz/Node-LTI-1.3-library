@@ -8,6 +8,7 @@ const { tokenMaker } = require("../lti_lib/token_generator");
 const { grade_project } = require("../tool/grading_tool");
 const { keyGenerator } = require('../lti_lib/keyGenerator');
 const { grading_grade } = require("../lti_lib/student_score");
+const { registerPlatform } = require('../lti_lib/register_platform');
 const mongoose = require('mongoose');
 
 const app = express();
@@ -46,6 +47,14 @@ mongoose.connect('mongodb://localhost:27017/TESTLTI', {
 );
 mongoose.Promise = Promise;
 
+registerPlatform(
+  'https://demo.moodle.net', 
+  'Grading Tool', '5IuM8ph0WYqeF2d', 
+  'https://localhost:3000/main', 
+  'https://localhost:3000/login', 
+  { method: 'JWK_SET', key: 'https://localhost:3000/keyset' },
+);
+
 app.get("/", (req, res) => {
   res.render("index");
 });
@@ -61,6 +70,7 @@ app.post("/project/submit", (req, res) => {
 });
 
 app.get("/project/submit", (req, res) => {
+
   res.render("submit", {
     payload: req.session.payload, 
     formData: req.body.formData
