@@ -15,7 +15,11 @@
     table {
       font-family: arial, sans-serif;
       border-collapse: collapse;
-      width: 100%;
+    }
+
+    table td.fit {
+      white-space: nowrap;
+      width: 1%;
     }
 
     td,
@@ -95,37 +99,45 @@
       <table>
         <tr>
           <td>
-            <p><strong>Github URL:</strong> <% if (formData != null) { %>
+            <strong>Github URL:</strong>
+          </td>
+          <td>
+            <% if (formData != null) { %>
               <%= formData.gitUrl %>
-              <% } %>
-            </p>
+            <% } %>            
           </td>
         </tr>
 
         <tr>
+          <td class='fit'>
+            <strong>Heroku URL:</strong>
+          </td>
           <td>
-            <p><strong>Heroku URL:</strong> <% if (formData != null) { %>
+            <% if (formData != null) { %>
               <%= formData.heroUrl %>
-              <% } %>
-            </p>
+            <% } %>
           </td>
         </tr>
 
         <tr>
           <td>
-            <p><strong>URL Status:</strong> <% if (formData != null) { %>
+            <strong>URL Status:</strong>
+          </td>
+          <td>
+            <% if (formData != null) { %>
               <%= formData.urlStatus %>
-              <% } %>
-            </p>
+            <% } %>
           </td>
         </tr>
 
         <tr>
           <td>
-            <p><strong>Grade:</strong> <% if (formData != null)  { %>
+            <strong>Grade:</strong>
+          </td>
+          <td>
+            <% if (formData != null)  { %>
               <%= formData.grade %>
-              <% } %>
-            </p>
+            <% } %>
           </td>
         </tr>
       </table>

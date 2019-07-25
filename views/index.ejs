@@ -4,20 +4,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <title>Pied Piper LTI1.3 Example</title>
+  <title>Pied Piper LTI1.3 Library Example</title>
 </head>
 
 <body class='bg-light'>
   <div class='text-center my-5'>
-    <h1 class='mb-5'>Test LTI Tool</h1>
-    <p>See how the Pied Piper LTI Library works.</p>
-    <p>A Grader Tool is used as an example Tool.</p>
-    <button id='get-token' class='mr-5 mt-5 bg-info p-2'>Get Token</button>
-    <button id='launch-tool' class='bg-info p-2'>Launch Tool</button>
+    <h1 class='mb-5'>LTI 1.3 Library Usage Example</h1>
+    <h4 class="mb-5">See the Pied Piper LTI 1.3 Library in action. A Grader Module is used as the Tool example.</h4>
+    <p>1) When a student clicks a link in their course, their LMS initiates an OIDC login to the Tool, simulate this by clicking:
+    <button id='init-login' class='bg-success p-2 border rounded'>Initiate Login from LMS</button></p>
+    <div class='text-center card my-5 mx-5'>
+        <h6 class='card-header border-success'>Library Provided Login Response</h6>
+        <code id='oidc'>Press 'Initiate Login' to mimic a student clicking a link in the LMS</code>
+    </div>
+    <p>2) Based on above Login Response, the LMS will request that the Tool be launched, simulate this by clicking:
+    <button id='launch-tool' class='bg-success p-2 rounded'>Launch Tool</button></p>
   </div>
   <hr />
-  <div class='text-center card mt-5 mx-5'>
-      <h4 class='card-header bg-info'>Your Token</h4>
+  <div class='text-center'>
+      <p>3) The Library supports OAuth 2.0, generate a JSON Web Token by clicking:
+      <button id='get-token' class='mt-5 bg-warning p-2 rounded'>Get Token</button></p>
+  </div>
+  <div class='text-center card mx-5 my-5'>
+      <h6 class='card-header border-warning'>Your Token</h6>
       <p id='token'>Press 'Get Token' to generate a token!</p>
   </div>
 </body>
@@ -38,6 +47,28 @@
     })
     .then(res => {
       document.getElementById('token').innerHTML = res.jwt;
+    })
+    .catch(err => {
+      console.error(`Error: ${err}`);
+    });
+  });
+
+  document.getElementById('init-login').addEventListener('click', async _ => {
+    fetch('http://localhost:3000/oidc', {
+      'method': 'post',
+      'headers': { 'content-type': 'application/json' },
+      'body': JSON.stringify({ 
+        iss: 'https://www.sandiegocode.school',
+        target_link_uri: 'http://localhost:3000/project/submit',
+        login_hint: '9',
+        lti_message_hint: '377' 
+      })
+    })
+    .then(function(response) {
+      return response.json();
+    })
+    .then(res => {
+      document.getElementById('oidc').innerHTML = JSON.stringify(res, null, '\t');
     })
     .catch(err => {
       console.error(`Error: ${err}`);
