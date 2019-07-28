@@ -14,7 +14,6 @@ class Database {
         platformData = [...registeredPlatform];
       }
     });
-    // console.log(platformData);
     return platformData;
   };
 

@@ -31,7 +31,6 @@ const registerPlatform = async (
 
   //checks database for existing platform.
   if (existingPlatform.length === 1) {
-    console.log(existingPlatform);
     return existingPlatform;
   } else {
     const keyPairs = keyGenerator();
@@ -46,7 +45,7 @@ const registerPlatform = async (
       'kid': keyPairs,
       'consumerAuthorizationconfig': consumerAuthorizationconfig,
     });
-    return console.log(`Platform registered at: ${consumerUrl}`, existingPlatform);
+    return console.log(`Platform registered at: ${consumerUrl}`);
   };
   
 };
