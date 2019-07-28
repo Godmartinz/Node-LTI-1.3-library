@@ -6,7 +6,6 @@ const { valid_oauth2_request } = require("../lti_lib/oauth2_validation");
 const { launchTool } = require("../lti_lib/launch_validation");
 const { tokenMaker } = require("../lti_lib/token_generator");
 const { grade_project } = require("../tool/grading_tool");
-const { keyGenerator } = require('../lti_lib/keyGenerator');
 const { grading_grade } = require("../lti_lib/student_score");
 const { registerPlatform } = require('../lti_lib/register_platform');
 const mongoose = require('mongoose');
@@ -55,7 +54,7 @@ mongoose.Promise = Promise;
     'https://demo.moodle.net/mod/lti/token.php', 
     { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
   );
-
+  
 app.get("/", (req, res) => {
   res.render("index");
 });
