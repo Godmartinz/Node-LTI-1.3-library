@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-mongoose.set('CreateIndex', true);
 const Database = require('./mongoDB/Database.js');
+const { keyGenerator } = require('./keyGenerator.js');
 const Schema = mongoose.Schema;
 
 const platformSchema = new Schema({
@@ -9,13 +9,14 @@ const platformSchema = new Schema({
   consumerClientID: String,
   consumerAuthorizationURL: String,
   consumerAccessTokenURL: String,
+  kid: Array,
   consumerAuthorizationconfig: {
     method: String,
     key: String
   }
 });
 
-const registerPlatform = (
+const registerPlatform = async (
   consumerUrl, /* Base url of the LMS. */
   consumerName, /* Name of the LMS. */
   consumerClientID, /* Client ID created from the LMS. */
@@ -26,20 +27,28 @@ const registerPlatform = (
   if ( !consumerUrl || !consumerName || !consumerClientID || !consumerAuthorizationURL || !consumerAccessTokenURL || !consumerAuthorizationconfig ) {
     console.log('Error: registerPlatform function is missing argument.');
   };
+  let existingPlatform = await Database.Get('platforms', platformSchema, { consumerUrl: consumerUrl });
 
+  //checks database for existing platform.
+  if (existingPlatform.length === 1) {
+    console.log(existingPlatform);
+    return existingPlatform;
+  } else {
+    const keyPairs = keyGenerator();
 
-  // let existingPlatform = Database.Get('platform', { consumerUrl: consumerUrl });
-  // console.log(existingPlatform);
+    // .Insert() method accepts ('platforms', platformSchema { consumerUrl: consumerUrl, ...})
+    Database.Insert('platforms', platformSchema, { 
+      'consumerUrl': consumerUrl,
+      'consumerName': consumerName,
+      'consumerClientID': consumerClientID,
+      'consumerAuthorizationURL': consumerAuthorizationURL,
+      'consumerAccessTokenURL': consumerAccessTokenURL,
+      'kid': keyPairs,
+      'consumerAuthorizationconfig': consumerAuthorizationconfig,
+    });
+    return console.log(`Platform registered at: ${consumerUrl}`, existingPlatform);
+  };
   
-  Database.Insert('platform', { 
-    consumerUrl: consumerUrl,
-    consumerName: consumerName,
-    consumerClientID: consumerClientID,
-    consumerAuthorizationURL: consumerAuthorizationURL,
-    consumerAccessTokenURL: consumerAccessTokenURL,
-    consumerAuthorizationconfig: consumerAuthorizationconfig,
-  });
-
 };
 
 module.exports = { registerPlatform };

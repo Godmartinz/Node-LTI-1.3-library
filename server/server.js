@@ -47,13 +47,14 @@ mongoose.connect('mongodb://localhost:27017/TESTLTI', {
 );
 mongoose.Promise = Promise;
 
-registerPlatform(
-  'https://demo.moodle.net', 
-  'Grading Tool', '5IuM8ph0WYqeF2d', 
-  'https://localhost:3000/main', 
-  'https://localhost:3000/login', 
-  { method: 'JWK_SET', key: 'https://localhost:3000/keyset' },
-);
+  registerPlatform(
+    'https://demo.moodle.net',
+    'Grading Tool',
+    'ZCHk6MtkBk9WLH0',
+    'https://demo.moodle.net/mod/lti/auth.php',
+    'https://demo.moodle.net/mod/lti/token.php', 
+    { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
+  );
 
 app.get("/", (req, res) => {
   res.render("index");
@@ -76,8 +77,6 @@ app.get("/project/submit", (req, res) => {
     formData: req.body.formData
   }
   );
- 
-  
 });
 
 app.post(`/project/grading`, (req, res) => {

@@ -3,20 +3,26 @@ const mongoose = require('mongoose');
 class Database {
 
   // TODO: incorperate encryption for stored platform keys.
-  static Get(collection, query) {
-    let Model = mongoose.model(collection);
-    let result = Model.find(query);
+  static async Get(collection, platformSchema, query) {
+    let Model = mongoose.model(collection, platformSchema);
+    let platformData = [];
 
-    if (result.length === 0) return false
-    
-    return result;
+    await Model.find(query, (err, registeredPlatform) => {
+      if (err) {
+        return console.log(`Error Finding platform: ${err}`);
+      } else {
+        platformData = [...registeredPlatform];
+      }
+    });
+    // console.log(platformData);
+    return platformData;
   };
 
   // TODO: incorperate encryption for stored platform keys.
-  static Insert(collection, platformShema) {
-    let Model = mongoose.model(collection, platformShema)
+  static Insert(collection, platformSchema, platform) {
+    let Model = mongoose.model(collection, platformSchema);
 
-    let newPlatform = new Model(platformShema);
+    let newPlatform = new Model(platform);
     newPlatform.save();
     return true;
   };
