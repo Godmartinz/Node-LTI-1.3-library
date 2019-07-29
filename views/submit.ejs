@@ -144,9 +144,7 @@
       <br>
 
       <% if (formData != null) { %>
-        <% if (formData.grade != null) { %>
-            <button type="button" class="btn btn-primary">Done</button>
-        <% } else { %>
+        <% if (formData.grade === null) { %>
           <button type="submit" class="btn btn-primary">Submit</button> 
           <button type="reset" value="reset" class="btn btn-danger" id="change">Clear</button>
         <% } %>
@@ -156,13 +154,21 @@
       <% } %>
 
     </form>
+    
+    <form method="POST" action="/project/return">
+      <% if (formData != null && formData.grade != null) { %>
+        <button type="submit" class="btn btn-primary">Done</button>
+      <% } %>
+
+    </form>
+
   </div>
 
   <script>
 
     var result = $("body");
     $('#change').click(function () {
-      result.load('/project/submit/' + document.getElementById('projectName').innerText);
+      result.load('/project/submit/');
     });
 
   </script>

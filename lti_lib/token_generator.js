@@ -21,6 +21,10 @@ function tokenMaker(errors, res) {
     const jwt_payload = jwt.sign(payload, process.env.CLIENT_SECRET, {
       algorithm: "RS256"
     });
+    // console.log('signed');
+    // console.log(jwt_payload);
+    // console.log(jwt.decode(jwt_payload));
+    // console.log(jwt.verify(jwt_payload,'-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCA-----END PUBLIC KEY-----', {algorithm: 'RS256'}));
     return res.status(200).send({ jwt: jwt_payload });
   } else {
     if (errors.findIndex(e => e.includes("grant type invalid")) >= 0) {
