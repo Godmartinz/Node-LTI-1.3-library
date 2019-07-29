@@ -47,12 +47,12 @@ mongoose.connect('mongodb://localhost:27017/TESTLTI', {
 mongoose.Promise = Promise;
 
   registerPlatform(
-    'https://demo.moodle.net',
-    'Grading Tool',
-    'ZCHk6MtkBk9WLH0',
-    'https://demo.moodle.net/mod/lti/auth.php',
-    'https://demo.moodle.net/mod/lti/token.php', 
-    { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
+    'https://www.sandiegocode.school/',
+    'SanDiegocode.school',
+    'uuYLGWBmhhuZvBf',
+    'https://www.sandiegocode.school/mod/lti/auth.php',
+    'https://www.sandiegocode.school/mod/lti/token.php', 
+    { method: 'JWK_SET', key: 'https://www.sandiegocode.school/mod/lti/certs.php' }
   );
   
 app.get("/", (req, res) => {

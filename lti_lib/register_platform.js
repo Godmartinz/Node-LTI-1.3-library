@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 const platformSchema = new Schema({
   consumerUrl: String,
   consumerName: String,
-  consumerClientID: String,
+  consumerToolClientID: String,
   consumerAuthorizationURL: String,
   consumerAccessTokenURL: String,
   kid: Array,
@@ -18,13 +18,13 @@ const platformSchema = new Schema({
 
 const registerPlatform = async (
   consumerUrl, /* Base url of the LMS. */
-  consumerName, /* Name of the LMS. */
-  consumerClientID, /* Client ID created from the LMS. */
+  consumerName, /* Domain name of the LMS. */
+  consumerToolClientID, /* Client ID created from the LMS. */
   consumerAuthorizationURL, /* URL that the LMS redirects to launch the tool. */
   consumerAccessTokenURL, /* URL that the LMS redirects to obtain an access token/login . */
   consumerAuthorizationconfig, /* Authentication method and key for verifying messages from the platform. {method: "RSA_KEY", key:"PUBLIC KEY..."} */
 ) => {
-  if ( !consumerUrl || !consumerName || !consumerClientID || !consumerAuthorizationURL || !consumerAccessTokenURL || !consumerAuthorizationconfig ) {
+  if ( !consumerUrl || !consumerName || !consumerToolClientID || !consumerAuthorizationURL || !consumerAccessTokenURL || !consumerAuthorizationconfig ) {
     console.log('Error: registerPlatform function is missing argument.');
   };
   let existingPlatform = await Database.Get('platforms', platformSchema, { consumerUrl: consumerUrl });
@@ -35,11 +35,11 @@ const registerPlatform = async (
   } else {
     const keyPairs = keyGenerator();
 
-    // .Insert() method accepts ('platforms', platformSchema { consumerUrl: consumerUrl, ...})
+    // .Insert() method accepts ('platforms', platformSchema, objectToInsert { consumerUrl: consumerUrl, ...})
     Database.Insert('platforms', platformSchema, { 
       'consumerUrl': consumerUrl,
       'consumerName': consumerName,
-      'consumerClientID': consumerClientID,
+      'consumerToolClientID': consumerToolClientID,
       'consumerAuthorizationURL': consumerAuthorizationURL,
       'consumerAccessTokenURL': consumerAccessTokenURL,
       'kid': keyPairs,
@@ -50,4 +50,4 @@ const registerPlatform = async (
   
 };
 
-module.exports = { registerPlatform };
+module.exports = { platformSchema, registerPlatform };
