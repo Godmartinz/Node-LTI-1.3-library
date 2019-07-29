@@ -47,7 +47,7 @@ function keyGenerator() {
     }
   );
 
-  keys.push(publicKey, privateKey);
+  keys.push({ 'publicKey': publicKey , 'privateKey': privateKey });
 
   return keys;
 }
