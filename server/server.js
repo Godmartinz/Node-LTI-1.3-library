@@ -6,8 +6,9 @@ const { valid_oauth2_request } = require("../lti_lib/oauth2_validation");
 const { launchTool } = require("../lti_lib/launch_validation");
 const { tokenMaker } = require("../lti_lib/token_generator");
 const { grade_project } = require("../tool/grading_tool");
-const { keyGenerator } = require('../lti_lib/keyGenerator');
 const { grading_grade } = require("../lti_lib/student_score");
+const { registerPlatform } = require('../lti_lib/register_platform');
+const mongoose = require('mongoose');
 
 const app = express();
 
@@ -35,6 +36,25 @@ app.use( (req,res,next) => {
 app.set("views", "./views");
 app.set("view engine", "ejs");
 
+mongoose.connect('mongodb://localhost:27017/TESTLTI', {
+  useNewUrlParser: true},
+  (err) => {
+    if(err) {
+      return console.log(err);
+    }
+  }
+);
+mongoose.Promise = Promise;
+
+  registerPlatform(
+    'https://www.sandiegocode.school/',
+    'SanDiegocode.school',
+    'uuYLGWBmhhuZvBf',
+    'https://www.sandiegocode.school/mod/lti/auth.php',
+    'https://www.sandiegocode.school/mod/lti/token.php', 
+    { method: 'JWK_SET', key: 'https://www.sandiegocode.school/mod/lti/certs.php' }
+  );
+  
 app.get("/", (req, res) => {
   res.render("index");
 });
@@ -50,13 +70,12 @@ app.post("/project/submit", (req, res) => {
 });
 
 app.get("/project/submit", (req, res) => {
+
   res.render("submit", {
     payload: req.session.payload, 
     formData: req.body.formData
   }
   );
- 
-  
 });
 
 app.post(`/project/grading`, (req, res) => {
