@@ -1,6 +1,6 @@
-const Joi = require("@hapi/joi");
+// const Joi = require("@hapi/joi");
 const jwt = require('jsonwebtoken');
-var fs = require('file-system');
+const jwkToPem = require('jwk-to-pem');
 const axios = require('axios');
 
 /*
@@ -79,9 +79,9 @@ function valid_launch_request(body, req) {
   //Check the Audience matches Tool's Client ID.  Note Audience can be an array or a single string
   //If multiple Audiences are present, must all check that the Authorized Party is present and valid.
   if (body.hasOwnProperty('aud')) {
-    if (typeof body.aud === 'array' && !body.aud.includes(process.env.CLIENT_ID &&
-      body.hasOwnProperty('azp') && !body.azp !== process.env.CLIENT_ID) ||
-      body.aud !== process.env.CLIENT_ID) {
+    if (typeof body.aud === 'array' && !body.aud.includes(req.session.platform_DBinfo.consumerToolClientID &&
+      body.hasOwnProperty('azp') && !body.azp !== req.session.platform_DBinfo.consumerToolClientID) ||
+      body.aud !== req.session.platform_DBinfo.consumerToolClientID) {
       errors.push("Audience invalid", body.aud);
     }
   } else {
@@ -228,81 +228,70 @@ function valid_launch_request(body, req) {
 /*
 * Validates that the required keys are present and filled per LTI 1.3 standards in conjunction with the OAuth_validation
 * before launching Tool.
-* 
-* launchTool() should be called inside the route block that the Tool will be initiated.
+* @param req Request 
+* @param res Response
+* @param path - if any path needs to be appended to the URI to launch the Tool to the correct route
+* @returns object with errors if invalid launch, otherwise, redirects to Tool
 */
-function launchTool(req, res) {
-  const schema = Joi.object().keys({
-    "https://purl.imsglobal.org/spec/lti/claim/message_type": Joi.string()
-      .exist()
-      .required(),
-    "https://purl.imsglobal.org/spec/lti/claim/deployment_id": Joi.string()
-      .exist()
-      .required()
-      .max(255),
-    "https://purl.imsglobal.org/spec/lti/claim/resource_link": Joi.string()
-      .exist()
-      .required()
-      .max(255),
-    client_id: Joi.string()
-      .exist()
-      .required()
-      .empty(),
-    sub: Joi.string().exist(),
-    "https://purl.imsglobal.org/spec/lti/claim/roles": Joi.exist().required(),
-    redirect_uri: Joi.exist().required(),
-    response_type: Joi.string().exist(),
-    scope: Joi.string().exist()
-  });
+function launchTool(req, res, path) {
+  // const schema = Joi.object().keys({
+  //   "https://purl.imsglobal.org/spec/lti/claim/message_type": Joi.string()
+  //     .exist()
+  //     .required(),
+  //   "https://purl.imsglobal.org/spec/lti/claim/deployment_id": Joi.string()
+  //     .exist()
+  //     .required()
+  //     .max(255),
+  //   "https://purl.imsglobal.org/spec/lti/claim/resource_link": Joi.string()
+  //     .exist()
+  //     .required()
+  //     .max(255),
+  //   client_id: Joi.string()
+  //     .exist()
+  //     .required()
+  //     .empty(),
+  //   sub: Joi.string().exist(),
+  //   "https://purl.imsglobal.org/spec/lti/claim/roles": Joi.exist().required(),
+  //   redirect_uri: Joi.exist().required(),
+  //   response_type: Joi.string().exist(),
+  //   scope: Joi.string().exist()
+  // });
 
-  if (!schema.validate(req) ) {
-    res.status(422).json({ errors: errors.array() });
+  // if (!schema.validate(req) ) {
+  //   res.status(422).json({ errors: errors.array() });
+  // } else {
+
+  let errors = [];
+  if (req.body.hasOwnProperty('error')) {
+    errors = [`Login Response was rejected: ${req.body.error}`];
   } else {
     const jwt_string = req.body.id_token; 
-    console.log(jwt_string);
-    let decoded = jwt.decode(jwt_string, {complete: true});
-    // axios.get('https://www.sandiegocode.school/mod/lti/certs.php?kid=' + decoded.header.kid)
-    //   .then(res => res)
-    //   .then(keys => {
-    //     console.log(keys.data.keys[0].n);
-    //     jwt.verify(jwt_string,'-----BEGIN PUBLIC KEY-----' + keys.data.keys[0].n + '-----END PUBLIC KEY-----',
-    //       {algorithm: 'RS256'}, (err, dec) => console.log(dec, err));
-    //   });
-    // decoded = decoded.payload;
-    req.session.decoded_launch = decoded;
-    // console.log('decoded');
-    console.log(decoded);
-    if (decoded) {
-      const errors = valid_launch_request(decoded, req);
-      if (errors.length === 0) {
-        return res.send({ payload: req.session.payload } && res.redirect(decoded['https://purl.imsglobal.org/spec/lti/claim/target_link_uri'] + '/project/submit'));  //req.session.payload.redirect_uri));
-      } else {
-        console.log(errors);
-        return res.status(400).send({
-          error: "invalid_request",
-          error: errors
-        });
-      }
-    }
+    let basic_decoded = jwt.decode(jwt_string, {complete: true});
+   
+    axios.get(req.session.platform_DBinfo.consumerAuthorizationconfig.key + '?kid=' + basic_decoded.header.kid)
+    .then(keys => {
+      jwt.verify(jwt_string, jwkToPem(keys.data.keys[0]), {algorithm: 'RS256'}, (err, decoded) => {
+        if (err) {
+          errors = [`Could not verify token: ${err}`];
+        } else {
+          //Save decoded OIDC Launch Request to reference later during the current session
+          req.session.decoded_launch = decoded;
+          
+          errors = valid_launch_request(decoded, req);
+          if (errors.length === 0) {
+            //No errors, so redirect to the Tool
+            return res.send({ payload: req.session.payload } && res.redirect(decoded['https://purl.imsglobal.org/spec/lti/claim/target_link_uri'] + path));
+          }
+        }
+      });
+    });
+  }
+  if (errors.length > 0) {
+    return res.status(400).send({
+      error: "invalid_request",
+      errors: errors
+    });
   }
 }
-
-//launch with Bearer Token requires: req.headers.authorization.split(" ")[1];
-
-//Verify JWT 
-// const pubkey = fs.readFileSync('./pub_sdcs');
-// jwt.verify(jwt_string,new Buffer(pubkey, 'base64'),{algorithm: 'RS256'}, (err, dec) => console.log(dec, err));
-    //     if (err) {
-    //       console.log(jwt_string);
-    //       console.log(err);
-    //       return res.status(401).send("invalid_token");
-
-// /* Redirects to another page based on the redirect URI. Still waiting to implement, need more info on what the LMS payload will be. */
-//   function targetRedirect(req, res){
-//     target_URI= req.body.redirect_uri
-
-//     res.redirect(target_URI);
-//   }
-// }
-
+      
 module.exports = { launchTool, valid_launch_request };

@@ -7,10 +7,12 @@ const { valid_oauth2_request } = require("../lti_lib/oauth2_validation");
 const { create_oidc_response, is_valid_oidc_launch } = require("../lti_lib/oidc");
 const { launchTool } = require("../lti_lib/launch_validation");
 const { tokenMaker } = require("../lti_lib/token_generator");
-const { grade_project } = require("../tool/grading_tool");
+const { send_score } = require("../lti_lib/student_score");
 const { registerPlatform } = require('../lti_lib/register_platform');
 const mongoose = require('mongoose');
-const { send_score } = require("../lti_lib/student_score");
+const Database = require('../lti_lib/mongoDB/Database.js');
+const { platformSchema } = require('../lti_lib/register_platform');
+const { grade_project } = require("../tool/grading_tool");
 
 const app = express();
 
@@ -29,7 +31,7 @@ app.use(session({
   resave: true,
   // secure: true,
   // ephemeral: true,
-  // httpOnly: true
+  // httpOnly: true,
   // TODO:  use connect-mongo to store session in our MongoDB once it is up and running
   // Right now it is being stored in memory, and should not be used in production this way
   // store: new MongoStore({ mongooseConnection: mongoose.connection })
@@ -53,65 +55,79 @@ mongoose.connect('mongodb://localhost:27017/TESTLTI', {
 );
 mongoose.Promise = Promise;
 
-  registerPlatform(
-    'https://www.sandiegocode.school/',
-    'SanDiegocode.school',
-    'uuYLGWBmhhuZvBf',
-    'https://www.sandiegocode.school/mod/lti/auth.php',
-    'https://www.sandiegocode.school/mod/lti/token.php', 
-    { method: 'JWK_SET', key: 'https://www.sandiegocode.school/mod/lti/certs.php' }
-  );
-  
+registerPlatform(
+  'https://www.sandiegocode.school',
+  'SanDiegocode.school',
+  'uuYLGWBmhhuZvBf',
+  'https://www.sandiegocode.school/mod/lti/auth.php',
+  'https://www.sandiegocode.school/mod/lti/token.php', 
+  { method: 'JWK_SET', key: 'https://www.sandiegocode.school/mod/lti/certs.php' }
+);
+
+registerPlatform(
+  'https://demo.moodle.net',
+  'Moodles demo',
+  'BMe642xnf4ag3Pd',
+  'https://demo.moodle.net/mod/lti/auth.php',
+  'https://demo.moodle.net/mod/lti/token.php', 
+  { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
+);
+
 app.get("/", (req, res) => {
-  console.log('/ with get');
   res.render("index");
 });
 
-app.post('/', (req, res) => {
-  console.log('/ with post');
+app.get('/oidc', (req, res) => {
+  console.log('only POSTs to /oidc are implemented at this time')
 });
 
-app.get('/oidc', (req, res) => {
-  req.session.login_request = req.body;
-  req.session.login_response = create_oidc_response(req);
-  console.log('/oidc GET, session id is: ', req.session.id);
-    // let platform = await Database.Get('platforms', platformSchema, { consumerUrl: req.body.iss });
-  res.redirect(url.format({
-    pathname: req.session.login_request.iss + '/mod/lti/auth.php',  // TODO:  Pull from DB (platform.consumerAuthorizationURL) after registration data is stored
-    query: req.session.login_response
-   }));
- });
-
 app.post('/oidc', (req, res) => {
+  //Save the OIDC Login Request to reference later during current session
   req.session.login_request = req.body;
-  req.session.login_response = create_oidc_response(req);
-  console.log('/oidc POST, session id is: ', req.session.id);
-    // let platform = await Database.Get('platforms', platformSchema, { consumerUrl: req.session.login_request.iss });
-    res.redirect(url.format({
-      pathname: req.session.login_request.iss + '/mod/lti/auth.php',  // TODO:  Pull from DB (platform.consumerAuthorizationURL) after registration data is stored
-      // pathname: 'https://demo.moodle.net/mod/lti/auth.php',
-    query: req.session.login_response
-  }));
+
+  Database.Get('platforms', platformSchema, { consumerUrl: req.session.login_request.iss })
+  .then(dbResult => {
+    if (dbResult.length === 1) return dbResult[0]
+    else res.send(['Issuer invalid: not registered']);
+  }).then(platform => {
+    //Save the Platform information from the database to reference later during current session
+    req.session.platform_DBinfo = platform;
+
+    //Save the OIDC Login Response to reference later during current session
+    req.session.login_response = create_oidc_response(req);
+
+    if (Array.isArray(req.session.login_response)) {   
+      //errors were found, so return the errors
+      res.send(req.session.login_response);
+    } else {
+      //no errors, send the OIDC Login Response
+      res.redirect(url.format({
+        pathname: platform.consumerAuthorizationURL, 
+        query: req.session.login_response
+      }));
+    }
+  });
 });
 
 app.post("/oauth2/token", (req, res) => {
-  console.log('oauth2/token');
+  //Route not currently being used
   var errors = valid_oauth2_request(req);
   tokenMaker(errors, res);
 });
 
 app.post("/project/submit", (req, res) => {
-  console.log('post for project/submit');
+  //Ensure Validity of OIDC Launch Request before launching Tool
   if (is_valid_oidc_launch(req)) {
+    //Save OIDC Launch Request for later reference during current session
     req.session.payload = req.body;
-    launchTool(req, res);
+    launchTool(req, res, '/project/submit');
   } else {
     res.send('invalid request');
   }
 });
 
 app.get("/project/submit", (req, res) => {
-  console.log('get for project/submit');
+  //Display the Project Submission page
   res.render("submit", {
     payload: req.session.payload, 
     formData: req.body.formData
@@ -119,10 +135,12 @@ app.get("/project/submit", (req, res) => {
 });
 
 app.post(`/project/grading`, (req, res) => {
-  console.log('post /project/grading');
+  //Grade the project and if there aren't errors with the grading, send the score.  Re-render Grading page.
   grade_project(req)
     .then(grading => {
-      send_score(grading.grade, req.session.payload)
+      if (!grading.error) {
+        send_score(grading.grade, req.session.decoded_launch)
+      }
       res.render("submit", {
         payload: req.session.payload, 
         formData: grading
@@ -131,22 +149,25 @@ app.post(`/project/grading`, (req, res) => {
 });
 
 app.post('/project/return', (req, res) => {
-  console.log('in return route');
+  //When user is done with Tool, return to LMS 
   res.redirect(req.session.decoded_launch["https://purl.imsglobal.org/spec/lti/claim/launch_presentation"].return_url);
   req.session.destroy();
 });
 
 app.get('/demo/oidc', (req, res) => {
+  //Sends an OIDC Login Response for demo purposes
   req.body = { 
     iss: 'https://www.sandiegocode.school',
     target_link_uri: 'https://piedpiper.localtunnel.me/project/submit',
     login_hint: '9',
     lti_message_hint: '377' 
   };
+  req.session.platform_DBinfo = {'consumerToolClientID': 'SDF7ASDLSFDS9'};
   res.send(create_oidc_response(req));
 })
 
 app.get('/demo/project/submit', (req, res) => {
+  //Launches the Grading Tool for demo purposes
   let request_object = {
     'sub': 'a6d5c443-1f51-4783-ba1a-7686ffe3b54a',
     'https://purl.imsglobal.org/spec/lti/claim/message_type': 'LtiResourceLinkRequest',

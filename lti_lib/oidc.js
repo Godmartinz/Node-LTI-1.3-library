@@ -1,22 +1,13 @@
 require('dotenv').config();
-// const mongoose = require('mongoose');
-// const Schema = mongoose.Schema;
-// const { platformSchema } = require('./registerPlatform');
 
 /*
-* Validates OIDC login request.  Checkes required parameters are present and looks up Issuer in database to ensure they
-* are registered with the Tool.
+* Validates OIDC login request.  Checkes required parameters are present.
 * @param req - OIDC login request sent from LMS to Tool
 * @returns array of errors, if empty then request is valid
 */
 function is_valid_oidc_login(req) {
   let errors = [];
-  if (req.body.hasOwnProperty('iss')) {
-    // let platform = await Database.Get('platforms', platformSchema, { consumerUrl: req.body.iss });
-    if (!true) {                                 // TODO:  need to look up issuer in DB (platform.consumerURL) and make sure they are registered
-      errors.push('Issuer not registered with Tool');
-    }
-  } else {
+  if (!req.body.hasOwnProperty('iss')) {
     errors.push('Issuer missing');
   }
   if (!req.body.hasOwnProperty('login_hint')) {
@@ -29,20 +20,21 @@ function is_valid_oidc_login(req) {
 }
 
 /* 
-* Validate OIDC login and construct response for valid logins.
+* Validate OIDC login and construct response for valid logins.  Looks up Issuer in database to ensure they are registered
+* with the Tool.
 * @param req - req sent from OIDC to Tool's OIDC login endpoint
 * @returns if valid request, returns properly formated response object
 * @return if invalid request, returns array of errors with the request
 */
 function create_oidc_response(req) {
   const errors = is_valid_oidc_login(req);
-  // let platform = await Database.Get('platforms', platformSchema, { consumerUrl: req.body.iss });
-  if (errors.length === 0) {
+
+  if (errors.length === 0 && req.session.platform_DBinfo) {
     let response = {
       scope: 'openid',
       response_type: 'id_token',
-      client_id: process.env.CLIENT_ID,           // TODO: need to get this from DB (platform.consumerClientID) as it is received from LMS on registration
-      redirect_uri: process.env.REDIRECT_URI,     // TODO: should this be stored in DB per Issuer (Consumer)?
+      client_id: req.session.platform_DBinfo.consumerToolClientID,
+      redirect_uri: process.env.REDIRECT_URI,     // TODO: store in DB per Issuer (Consumer)?
       login_hint: req.body.login_hint,
       state: create_unique_string(30, true),
       response_mode: 'form_post',
@@ -56,9 +48,10 @@ function create_oidc_response(req) {
       };
     }
     return response;
-  } else {
-    return errors;
+  } else if (!req.session.platform_DBinfo) {
+    errors.push('Issuer invalid: not registered');
   }
+  return errors;
 }
 
 /*

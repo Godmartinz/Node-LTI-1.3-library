@@ -1,19 +1,17 @@
 const axios = require('axios');
 
 function send_score(grade, payload) {
-
   if (payload.hasOwnProperty('https://purl.imsglobal.org/spec/lti-ags/claim/endpoint') &&
     payload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"].scope.includes('https://purl.imsglobal.org/spec/lti-ags/scope/score')) {
   
     var headers = {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/vnd.ims.lis.v1.score+json',
     }
-    axios.post(payload["https://purl.imsglobal.org/spec/lti-ags/scope/score"].lineitem + "/score", {
+    axios.post(payload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"].lineitem + "/scores", {
         "userId":  payload.sub,
         "scoreGiven": grade,
         "scoreMaximum": 1,
-        // "comment": "Well done!",
-        "timestamp": Date.now.toJSON(),
+        "timestamp": new Date(Date.now()).toJSON(),
         "activityProgress": "Completed",
         "gradingProgress": "FullyGraded"
 
