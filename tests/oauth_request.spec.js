@@ -14,7 +14,7 @@ describe('OAuth2.0 flow', function() {
   beforeEach(() => {
     good_data = {
       'grant_type': 'client_credentials',
-      'client_id': process.env.CLIENT_ID,
+      'client_id': 'uuYLGWBmhhuZvBf',
       'client_secret': process.env.CLIENT_SECRET
     };
   });
