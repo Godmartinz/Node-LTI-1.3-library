@@ -87,6 +87,7 @@ app.post('/oidc', (req, res) => {
 
   Database.Get('platforms', platformSchema, { consumerUrl: req.session.login_request.iss })
   .then(dbResult => {
+
     if (dbResult.length === 1) return dbResult[0]
     else res.send(['Issuer invalid: not registered']);
   }).then(platform => {
@@ -157,8 +158,8 @@ app.post('/project/return', (req, res) => {
 app.get('/demo/oidc', (req, res) => {
   //Sends an OIDC Login Response for demo purposes
   req.body = { 
-    iss: 'https://www.sandiegocode.school',
-    target_link_uri: 'https://piedpiper.localtunnel.me/project/submit',
+    iss: 'https://demo.moodle.net',
+    target_link_uri: 'https://piedpiper.localtunnel.me',
     login_hint: '9',
     lti_message_hint: '377' 
   };
@@ -168,40 +169,54 @@ app.get('/demo/oidc', (req, res) => {
 
 app.get('/demo/project/submit', (req, res) => {
   //Launches the Grading Tool for demo purposes
-  let request_object = {
-    'sub': 'a6d5c443-1f51-4783-ba1a-7686ffe3b54a',
-    'https://purl.imsglobal.org/spec/lti/claim/message_type': 'LtiResourceLinkRequest',
+  let request_object = { nonce: 'g2f2cdPpYqPK7AwHcyXhjf5VL',
+    iat: 1564506231,
+    exp: 1564506291,
+    iss: 'https://demo.moodle.net',
+    aud: 'uuYLGWBmhhuZvBf',
+    'https://purl.imsglobal.org/spec/lti/claim/deployment_id': '2',
+    'https://purl.imsglobal.org/spec/lti/claim/target_link_uri': 'https://piedpiper.localtunnel.me/',
+    sub: '9',
+    'https://purl.imsglobal.org/spec/lti/claim/roles':
+     [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner' ],
+    'https://purl.imsglobal.org/spec/lti/claim/context':
+     { id: '47',
+       label: 'AGILE200',
+       title: 'Internship',
+       type: [ 'CourseSection' ] },
+    'https://purl.imsglobal.org/spec/lti/claim/resource_link': { title: 'Test LTI for Team Pied Piper', id: '4' },
+    given_name: 'John',
+    family_name: 'Smith',
+    name: 'John Smith',
+    'https://purl.imsglobal.org/spec/lti/claim/ext':
+     { user_username: 'john.smith@gmail.com', lms: 'moodle-2' },
+    email: 'john.smith@gmail.com',
+    'https://purl.imsglobal.org/spec/lti/claim/launch_presentation':
+     { locale: 'en',
+       document_target: 'window',
+       return_url:
+        'https://www.sandiegocode.school/mod/lti/return.php?course=47&launch_container=4&instanceid=4&sesskey=xcsU4krTwV' },
+    'https://purl.imsglobal.org/spec/lti/claim/tool_platform':
+     { family_code: 'moodle',
+       version: '2019052000.01',
+       guid: 'demo.moodle.net',
+       name: 'Moodle Demo',
+       description: 'Moodle Demo Sandbox' },
     'https://purl.imsglobal.org/spec/lti/claim/version': '1.3.0',
-    given_name: 'Joe',
-    family_name: 'Schmoo',
-    name: 'Joe Schmoo',    
-    'client_id': 'uuYLGWBmhhuZvBf',
-    'redirect_uri': 'redirect uri',
-    'response_type': 'response type',
-    'scope': 'scope',
-    'https://purl.imsglobal.org/spec/lti/claim/deployment_id': '07940580-b309-415e-a37c-914d387c1150',
-    'https://purl.imsglobal.org/spec/lti/claim/roles': 
-    [ 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student',
-    'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner',
-    'http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor' ],
-    'https://purl.imsglobal.org/spec/lti/claim/tool_platform': {
-      'url': "https://platform.example.edu",
-    },    
-    'https://purl.imsglobal.org/spec/lti/claim/resource_link': 
-    { id: '200d101f-2c14-434a-a0f3-57c2a42369fd',
-    description: 'Assignment to introduce who you are',
-    title: 'Introduction Assignment' },
-    'https://purl.imsglobal.org/spec/lti/claim/context': {
-      id: 'random-id-with-cha.dfokasdf',
-      label: 'react100',
-      title: 'React for Beginners',
-      type: [ 'http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering' ]
-    },
-    "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint": {
-      scope: ["https://purl.imsglobal.org/spec/lti-ags/scope/score"],
-      "lineitems": "https://www.myuniv.example.com/2344/lineitems/",
-      "lineitem": "https://www.myuniv.example.com/2344/lineitems/1234/lineitem"
-    }
+    'https://purl.imsglobal.org/spec/lti/claim/message_type': 'LtiResourceLinkRequest',
+    'https://purl.imsglobal.org/spec/lti-ags/claim/endpoint':
+     { scope:
+        [ 'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly',
+          'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly',
+          'https://purl.imsglobal.org/spec/lti-ags/scope/score' ],
+       lineitems:
+        'https://www.sandiegocode.school/mod/lti/services.php/47/lineitems?type_id=2',
+       lineitem:
+        'https://www.sandiegocode.school/mod/lti/services.php/47/lineitems/109/lineitem?type_id=2' },
+    'https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice':
+     { context_memberships_url:
+        'https://www.sandiegocode.school/mod/lti/services.php/CourseSection/47/bindings/2/memberships',
+       service_versions: [ '1.0', '2.0' ] }
   };  
   res.render("submit", {
     payload: request_object, 
