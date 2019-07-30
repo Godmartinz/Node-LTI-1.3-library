@@ -6,7 +6,7 @@ class Database {
   static async Get(collection, platformSchema, query) {
     let Model = mongoose.model(collection, platformSchema);
     let platformData = [];
-    
+
     await Model.find(query, (err, registeredPlatform) => {
       if (err) {
         return console.log(`Error Finding platform: ${err}`);
