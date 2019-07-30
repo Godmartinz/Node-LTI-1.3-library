@@ -1,26 +1,25 @@
 const axios = require('axios');
 
-function grading_grade(grade, payload) {
+function send_score(grade, payload) {
+  if (payload.hasOwnProperty('https://purl.imsglobal.org/spec/lti-ags/claim/endpoint') &&
+    payload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"].scope.includes('https://purl.imsglobal.org/spec/lti-ags/scope/score')) {
+  
+    var headers = {
+      'Content-Type': 'application/vnd.ims.lis.v1.score+json',
+    }
+    axios.post(payload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"].lineitem + "/scores", {
+        "userId":  payload.sub,
+        "scoreGiven": grade,
+        "scoreMaximum": 1,
+        "timestamp": new Date(Date.now()).toJSON(),
+        "activityProgress": "Completed",
+        "gradingProgress": "FullyGraded"
 
-    if(payload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"].scope.includes('https://purl.imsglobal.org/spec/lti-ags/scope/score') ) {
-    
-        var headers = {
-         'Content-Type': 'application/json',
-        }
-        axios.post(payload["https://purl.imsglobal.org/spec/lti-ags/scope/score"].lineitem + "/score", {
-            "userId":  payload.sub,
-            "scoreGiven": grade,
-            "scoreMaximum": 1,
-            "comment": "Well done!",
-            "timestamp": Date.now.toJSON(),
-            "activityProgress": "Completed",
-            "gradingProgress": "FullyGraded"
-
-        }, { headers: headers })
-        .catch((error) => {
-            console.error(error)
-        })
-    } 
+    }, { headers: headers })
+    .catch((error) => {
+        console.error(error)
+    })
+  } 
 }
 
-module.exports = { grading_grade };
+module.exports = { send_score };
