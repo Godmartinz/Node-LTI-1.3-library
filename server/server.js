@@ -33,7 +33,9 @@ app.use( (req,res,next) => {
 app.set("views", "./views");
 app.set("view engine", "ejs");
 
+
 mongoose.connect(process.env.MONGODB_URI, {
+
   useNewUrlParser: true},
   (err) => {
     if(err) {
