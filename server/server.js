@@ -50,38 +50,26 @@ mongoose.connect(process.env.MONGODB_URI, {
       return console.log(err);
     }
 
-mongoose.Promise = Promise;
-  
-registerPlatform(
-  'https://www.sandiegocode.school',
-  'SanDiegocode.school',
-  'uuYLGWBmhhuZvBf',
-  'https://www.sandiegocode.school/mod/lti/auth.php',
-  'https://www.sandiegocode.school/mod/lti/token.php',
-  'https://www.sandiegocode.school/project/submit',
-  { method: 'JWK_SET', key: 'https://www.sandiegocode.school/mod/lti/certs.php' }
-);
-  
+// registerPlatform(
+//   'https://www.sandiegocode.school',
+//   'SanDiegocode.school',
+//   'uuYLGWBmhhuZvBf',
+//   'https://www.sandiegocode.school/mod/lti/auth.php',
+//   'https://www.sandiegocode.school/mod/lti/token.php',
+//   'https://www.sandiegocode.school/project/submit',
+//   { method: 'JWK_SET', key: 'https://www.sandiegocode.school/mod/lti/certs.php' }
+// );
+
 registerPlatform(
   'https://demo.moodle.net',
   'Moodles demo',
-  'CcuL9btxIKvnHKo',
+  'BMe642xnf4ag3Pd',
   'https://demo.moodle.net/mod/lti/auth.php',
-  'https://demo.moodle.net/mod/lti/token.php', 
+  'https://demo.moodle.net/mod/lti/token.php',
+  'https://demo.moodle.net/<tool launch url>',
   { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
 );
-    
-app.use(session({
-  name: 'lti_v1p3_library',
-  secret: 'iualcoelknasfnk',
-  saveUninitialized: true,
-  resave: true,
-  secure: true,
-  ephemeral: true,
-  httpOnly: true,
-  store: new MongoStore({ mongooseConnection: mongoose.connection })
-}));
-      
+
 app.get("/", (req, res) => {
   res.render("index");
 });
@@ -101,7 +89,7 @@ app.post('/oidc', (req, res) => {
 
   Database.Get('platforms', platformSchema, { consumerUrl: req.session.login_request.iss })
   .then(dbResult => {
-
+console.log(dbResult); // take out
     if (dbResult.length === 1) return dbResult[0]
     else res.send(['Issuer invalid: not registered']);
   }).then(platform => {
