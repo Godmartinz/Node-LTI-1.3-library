@@ -39,10 +39,7 @@ mongoose.connect(process.env.MONGODB_URI, {
   auth: {
     user: process.env.MONGO_USER,
     password: process.env.MONGO_PASSWORD
-  }},
-
-
-
+  },
   useNewUrlParser: true},
 
   (err) => {
