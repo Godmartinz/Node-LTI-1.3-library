@@ -159,7 +159,7 @@ app.get('/demo/oidc', (req, res) => {
   //Sends an OIDC Login Response for demo purposes
   req.body = { 
     iss: 'https://demo.moodle.net',
-    target_link_uri: 'https://piedpiper.localtunnel.me',
+    target_link_uri: 'https://node-lti-v1p3.herokuapp.com/',
     login_hint: '9',
     lti_message_hint: '377' 
   };
@@ -175,7 +175,7 @@ app.get('/demo/project/submit', (req, res) => {
     iss: 'https://demo.moodle.net',
     aud: 'uuYLGWBmhhuZvBf',
     'https://purl.imsglobal.org/spec/lti/claim/deployment_id': '2',
-    'https://purl.imsglobal.org/spec/lti/claim/target_link_uri': 'https://piedpiper.localtunnel.me/',
+    'https://purl.imsglobal.org/spec/lti/claim/target_link_uri': 'https://node-lti-v1p3.herokuapp.com//',
     sub: '9',
     'https://purl.imsglobal.org/spec/lti/claim/roles':
      [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner' ],
