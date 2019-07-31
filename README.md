@@ -44,6 +44,19 @@ This library requires MongoDB.  If you do not currently have MongoDB setup, foll
 
 < TODO:  add instructions for installing MongoDB for new users >
 
+Once you have MongoDB setup and have a server, you need to add the following to your server.js file:
+```
+mongoose.connect('mongodb://localhost:27017/TESTLTI', {
+  useNewUrlParser: true},
+  (err) => {
+    if(err) {
+      return console.log(err);
+    }
+  }
+);
+mongoose.Promise = Promise;
+```
+
 ### 3. Setup Server and Routes
 
 This library requires the use of an Express server.  Setup a basic Express server, add middleware, and routes within your server.js file to launch your Tool:
@@ -51,67 +64,39 @@ This library requires the use of an Express server.  Setup a basic Express serve
 *Middleware to store session information*
 ```
 app.use(session({
-  name: 'lti_13_library',
-  secret: <whatever you want the secret to be>,
+  name: 'lti_v1p3_library',
+  secret: 'iualcoelknasfnk',
   saveUninitialized: true,
   resave: true,
-});
+  secure: true,
+  ephemeral: true,
+  httpOnly: true,
+  store: new MongoStore({ mongooseConnection: mongoose.connection })
+}));
 ````
 
 *Route to Handle OIDC Login Requests*
 ```
 app.post('/oidc', (req, res) => {
-  //Save the OIDC Login Request to reference later during current session
-  req.session.login_request = req.body;
-
-  Database.Get('platforms', platformSchema, { consumerUrl: req.session.login_request.iss })
-  .then(dbResult => {
-    if (dbResult.length === 1) return dbResult[0]
-    else res.send(['Issuer invalid: not registered']);
-  }).then(platform => {
-    //Save the Platform information from the database to reference later during current session
-    req.session.platform_DBinfo = platform;
-
-    //Save the OIDC Login Response to reference later during current session
-    req.session.login_response = create_oidc_response(req);
-
-    if (Array.isArray(req.session.login_response)) {   
-      //errors were found, so return the errors
-      res.send(req.session.login_response);
-    } else {
-      //no errors, send the OIDC Login Response
-      res.redirect(url.format({
-        pathname: platform.consumerAuthorizationURL, 
-        query: req.session.login_response
-      }));
-    }
-  });
+  create_oidc_response(req, res);
 });
 ```
 
 *Route to Handle Tool Launches, must provide 'route to add to Base URL' if needed*
 ```
 app.post('/project/submit', (req, res) => {
-  //Ensure Validity of OIDC Launch Request before launching Tool
-  if (is_valid_oidc_launch(req)) {
-    //Save OIDC Launch Request for later reference during current session
-    req.session.payload = req.body;
-    launchTool(req, res, <route to add to Base URL>);
-  } else {
-    res.send('invalid request');
-  }
+    launchTool(req, res, < route to add to Base URL, if any >);
 });
 ```
 
 *Send score back to Platform - add to your Tool wherever grade is finalized*
 ```
-send_score(<student's score>, req.session.decoded_launch)
+  send_score(< student's score >, req.session.decoded_launch)
 ```
 
 *Route to return from Tool to Platform*
 ```
 app.post('/project/return', (req, res) => {
-  //When user is done with Tool, return to LMS 
   res.redirect(req.session.decoded_launch["https://purl.imsglobal.org/spec/lti/claim/launch_presentation"].return_url);
   req.session.destroy();
 });
