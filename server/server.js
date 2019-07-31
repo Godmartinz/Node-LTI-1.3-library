@@ -60,18 +60,20 @@ registerPlatform(
   'SanDiegocode.school',
   'uuYLGWBmhhuZvBf',
   'https://www.sandiegocode.school/mod/lti/auth.php',
-  'https://www.sandiegocode.school/mod/lti/token.php', 
+  'https://www.sandiegocode.school/mod/lti/token.php',
+  'https://www.sandiegocode.school/project/submit',
   { method: 'JWK_SET', key: 'https://www.sandiegocode.school/mod/lti/certs.php' }
 );
 
-registerPlatform(
-  'https://demo.moodle.net',
-  'Moodles demo',
-  'BMe642xnf4ag3Pd',
-  'https://demo.moodle.net/mod/lti/auth.php',
-  'https://demo.moodle.net/mod/lti/token.php', 
-  { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
-);
+// registerPlatform(
+//   'https://demo.moodle.net',
+//   'Moodles demo',
+//   'BMe642xnf4ag3Pd',
+//   'https://demo.moodle.net/mod/lti/auth.php',
+//   'https://demo.moodle.net/mod/lti/token.php',
+//   'https://demo.moodle.net/<tool launch url>',
+//   { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
+// );
 
 app.get("/", (req, res) => {
   res.render("index");
