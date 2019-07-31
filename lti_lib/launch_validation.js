@@ -165,7 +165,7 @@ function valid_launch_request(body, req) {
   // TODO: check actual value against database once user data is being stored
   if (body.hasOwnProperty('sub')) {
     if (body['sub'].length > 255) {
-      errors.push('Sub invalid', sub);
+      errors.push('Sub invalid', body['sub']);
     }
   } else {
     errors.push("Sub missing");
@@ -234,32 +234,6 @@ function valid_launch_request(body, req) {
 * @returns object with errors if invalid launch, otherwise, redirects to Tool
 */
 function launchTool(req, res, path) {
-  // const schema = Joi.object().keys({
-  //   "https://purl.imsglobal.org/spec/lti/claim/message_type": Joi.string()
-  //     .exist()
-  //     .required(),
-  //   "https://purl.imsglobal.org/spec/lti/claim/deployment_id": Joi.string()
-  //     .exist()
-  //     .required()
-  //     .max(255),
-  //   "https://purl.imsglobal.org/spec/lti/claim/resource_link": Joi.string()
-  //     .exist()
-  //     .required()
-  //     .max(255),
-  //   client_id: Joi.string()
-  //     .exist()
-  //     .required()
-  //     .empty(),
-  //   sub: Joi.string().exist(),
-  //   "https://purl.imsglobal.org/spec/lti/claim/roles": Joi.exist().required(),
-  //   redirect_uri: Joi.exist().required(),
-  //   response_type: Joi.string().exist(),
-  //   scope: Joi.string().exist()
-  // });
-
-  // if (!schema.validate(req) ) {
-  //   res.status(422).json({ errors: errors.array() });
-  // } else {
 
   let errors = [];
   if (req.body.hasOwnProperty('error')) {

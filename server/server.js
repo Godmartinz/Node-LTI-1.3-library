@@ -1,6 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
-const session = require('express-session')
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
 const url = require('url');    
 require("dotenv").config();
 const { valid_oauth2_request } = require("../lti_lib/oauth2_validation");
@@ -24,19 +25,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/favicon.ico', express.static('./favicon.ico'));
 
-app.use(session({
-  name: 'lti_13_library',
-  secret: 'iualcoelknasfnk',
-  saveUninitialized: true,
-  resave: true,
-  // secure: true,
-  // ephemeral: true,
-  // httpOnly: true,
-  // TODO:  use connect-mongo to store session in our MongoDB once it is up and running
-  // Right now it is being stored in memory, and should not be used in production this way
-  // store: new MongoStore({ mongooseConnection: mongoose.connection })
-}));
-
 app.use( (req,res,next) => {
   res.locals.formData = null;
   next();
@@ -52,9 +40,9 @@ mongoose.connect('mongodb://localhost:27017/TESTLTI', {
       return console.log(err);
     }
   }
-);
+  );
 mongoose.Promise = Promise;
-
+  
 registerPlatform(
   'https://www.sandiegocode.school',
   'SanDiegocode.school',
@@ -63,19 +51,35 @@ registerPlatform(
   'https://www.sandiegocode.school/mod/lti/token.php', 
   { method: 'JWK_SET', key: 'https://www.sandiegocode.school/mod/lti/certs.php' }
 );
-
+  
 registerPlatform(
   'https://demo.moodle.net',
   'Moodles demo',
-  'BMe642xnf4ag3Pd',
+  'CcuL9btxIKvnHKo',
   'https://demo.moodle.net/mod/lti/auth.php',
   'https://demo.moodle.net/mod/lti/token.php', 
   { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
 );
-
+    
+app.use(session({
+  name: 'lti_v1p3_library',
+  secret: 'iualcoelknasfnk',
+  saveUninitialized: true,
+  resave: true,
+  secure: true,
+  ephemeral: true,
+  httpOnly: true,
+  store: new MongoStore({ mongooseConnection: mongoose.connection })
+}));
+      
 app.get("/", (req, res) => {
   res.render("index");
 });
+
+app.post("/", (req, res) => {
+  console.log(req.body);
+});
+
 
 app.get('/oidc', (req, res) => {
   console.log('only POSTs to /oidc are implemented at this time')
