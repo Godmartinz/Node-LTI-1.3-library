@@ -33,6 +33,7 @@ app.use( (req,res,next) => {
 app.set("views", "./views");
 app.set("view engine", "ejs");
 
+
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true, 
   auth: {
@@ -40,11 +41,15 @@ mongoose.connect(process.env.MONGODB_URI, {
     password: process.env.MONGO_PASSWORD
   }},
 
+
+
+  useNewUrlParser: true},
+
   (err) => {
     if(err) {
       return console.log(err);
     }
-  });
+
 mongoose.Promise = Promise;
   
 registerPlatform(
