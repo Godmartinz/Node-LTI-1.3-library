@@ -60,6 +60,12 @@
             <button id='send-launch-req' class='bg-light mt-3 rounded'>Send Launch Tool Request</button></p>
             <div id='launch-req' id='oidc-card' class='card invisible'>
               <h6  class='card-header border-success p-1 invisible'>LMS Generated Launch Request</h6>
+              <p>The Launch Request received is in the following format (id_token is truncated for space)... </p>
+              <code id='launch-req-token' class='text-left'>
+              { id_token: 'eyJ0eXAiOiJKV1QiLCJhbGci...',
+               state: 'qb9k4xSFfQMFQWoEKZTXMehVaaKH1y' }
+              </code>
+              <p class='mt-3'>...and the Library decodes and validates it:</p>
               <code id='launch-req-code' class='text-left'></code>
             </div>
           </div>
