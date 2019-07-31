@@ -17,7 +17,7 @@ function passPhrase() {
 }
 //The signature and the verification needs to be updated with a proper consumerID or some other unique identifer
 function keyGenerator() {
-  var keys = [];
+  var keys = {};
 
   const { publicKey, privateKey } = generateKeyPairSync(
     "rsa",
@@ -47,8 +47,7 @@ function keyGenerator() {
     }
   );
 
-  keys.push({ 'publicKey': publicKey , 'privateKey': privateKey });
-
+  keys = { 'publicKey': publicKey , 'privateKey': privateKey };
   return keys;
 }
 
