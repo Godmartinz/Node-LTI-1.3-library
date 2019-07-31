@@ -9,6 +9,7 @@ const platformSchema = new Schema({
   consumerToolClientID: String,
   consumerAuthorizationURL: String,
   consumerAccessTokenURL: String,
+  consumerRedirect_URI: String,
   kid: Array,
   consumerAuthorizationconfig: {
     method: String,
@@ -22,9 +23,10 @@ const registerPlatform = async (
   consumerToolClientID, /* Client ID created from the LMS. */
   consumerAuthorizationURL, /* URL that the LMS redirects to launch the tool. */
   consumerAccessTokenURL, /* URL that the LMS redirects to obtain an access token/login . */
+  consumerRedirect_URI, /* URL that the LMS redirects to launch tool . */
   consumerAuthorizationconfig, /* Authentication method and key for verifying messages from the platform. {method: "RSA_KEY", key:"PUBLIC KEY..."} */
 ) => {
-  if ( !consumerUrl || !consumerName || !consumerToolClientID || !consumerAuthorizationURL || !consumerAccessTokenURL || !consumerAuthorizationconfig ) {
+  if ( !consumerUrl || !consumerName || !consumerToolClientID || !consumerAuthorizationURL || !consumerAccessTokenURL || !consumerRedirect_URI || !consumerAuthorizationconfig ) {
     console.log('Error: registerPlatform function is missing argument.');
   };
   let existingPlatform = await Database.Get('platforms', platformSchema, { consumerUrl: consumerUrl });
@@ -42,12 +44,12 @@ const registerPlatform = async (
       'consumerToolClientID': consumerToolClientID,
       'consumerAuthorizationURL': consumerAuthorizationURL,
       'consumerAccessTokenURL': consumerAccessTokenURL,
+      'consumerRedirect_URI': consumerRedirect_URI,
       'kid': keyPairs,
       'consumerAuthorizationconfig': consumerAuthorizationconfig,
     });
     return console.log(`Platform registered at: ${consumerUrl}`);
   };
-  
 };
 
 module.exports = { platformSchema, registerPlatform };

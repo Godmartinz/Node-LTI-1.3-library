@@ -57,7 +57,8 @@ registerPlatform(
   'SanDiegocode.school',
   'uuYLGWBmhhuZvBf',
   'https://www.sandiegocode.school/mod/lti/auth.php',
-  'https://www.sandiegocode.school/mod/lti/token.php', 
+  'https://www.sandiegocode.school/mod/lti/token.php',
+  'https://www.sandiegocode.school/project/submit',
   { method: 'JWK_SET', key: 'https://www.sandiegocode.school/mod/lti/certs.php' }
 );
   
