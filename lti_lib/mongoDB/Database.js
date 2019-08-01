@@ -13,7 +13,7 @@ class Database {
         platformData = [registeredPlatform];
       }
     });
-    return platformData;
+    return platformData; 
   };
 
   static async GetKey(collection, platformSchema, query) {
