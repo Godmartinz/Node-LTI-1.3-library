@@ -1,20 +1,24 @@
+//Require Standard Modules
 const express = require("express");
 const morgan = require("morgan");
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
-const url = require('url');    
-require("dotenv").config();
+const mongoose = require('mongoose');
+
+//Required Library methods
+const { registerPlatform } = require('../lti_lib/register_platform');
 const { valid_oauth2_request } = require("../lti_lib/oauth2_validation");
-const { create_oidc_response, is_valid_oidc_launch } = require("../lti_lib/oidc");
+const { create_oidc_response } = require("../lti_lib/oidc");
 const { launchTool } = require("../lti_lib/launch_validation");
 const { tokenMaker } = require("../lti_lib/token_generator");
 const { send_score } = require("../lti_lib/student_score");
-const { registerPlatform } = require('../lti_lib/register_platform');
-const mongoose = require('mongoose');
-const Database = require('../lti_lib/mongoDB/Database.js');
-const { platformSchema } = require('../lti_lib/register_platform');
+
+//Required Tool methods
 const { grade_project } = require("../tool/grading_tool");
 
+/*
+* Setup basic Express server
+*/
 const app = express();
 
 app.use(morgan("dev"));
@@ -23,6 +27,9 @@ app.use(express.json());
 app.use(express.text());
 app.use(express.urlencoded({ extended: true }));
 
+/*
+* Setup for Tool
+*/
 app.use('/favicon.ico', express.static('./favicon.ico'));
 
 app.use( (req,res,next) => {
@@ -33,23 +40,20 @@ app.use( (req,res,next) => {
 app.set("views", "./views");
 app.set("view engine", "ejs");
 
-
-mongoose.connect(process.env.MONGODB_URI, {
+/*
+* Setup MongoDB to store Platform data
+*/
+mongoose.connect(process.env.MONGODB_URI/*'mongodb://localhost:27017/TESTLTI'*/, {
   useNewUrlParser: true, 
   auth: {
     user: process.env.MONGO_USER,
     password: process.env.MONGO_PASSWORD
   }},
-
-
-
-  useNewUrlParser: true},
-
   (err) => {
     if(err) {
       return console.log(err);
     }
-
+});
 mongoose.Promise = Promise;
   
 registerPlatform(
@@ -64,12 +68,16 @@ registerPlatform(
 registerPlatform(
   'https://demo.moodle.net',
   'Moodles demo',
-  'CcuL9btxIKvnHKo',
+  'Naosq3H2J896F8G',
   'https://demo.moodle.net/mod/lti/auth.php',
   'https://demo.moodle.net/mod/lti/token.php', 
   { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
 );
-    
+
+
+/*
+* Setup Session to store data
+*/
 app.use(session({
   name: 'lti_v1p3_library',
   secret: 'iualcoelknasfnk',
@@ -80,68 +88,37 @@ app.use(session({
   httpOnly: true,
   store: new MongoStore({ mongooseConnection: mongoose.connection })
 }));
-      
-app.get("/", (req, res) => {
-  res.render("index");
-});
 
-app.post("/", (req, res) => {
-  console.log(req.body);
-});
-
-
+/*
+* Routes below are for OAuth, OIDC, and Token usage
+*/
 app.get('/oidc', (req, res) => {
-  console.log('only POSTs to /oidc are implemented at this time')
+  //TOOL:  OpenID Connect validation flow
+  create_oidc_response(req, res);
 });
 
 app.post('/oidc', (req, res) => {
-  //Save the OIDC Login Request to reference later during current session
-  req.session.login_request = req.body;
-
-  Database.Get('platforms', platformSchema, { consumerUrl: req.session.login_request.iss })
-  .then(dbResult => {
-
-    if (dbResult.length === 1) return dbResult[0]
-    else res.send(['Issuer invalid: not registered']);
-  }).then(platform => {
-    //Save the Platform information from the database to reference later during current session
-    req.session.platform_DBinfo = platform;
-
-    //Save the OIDC Login Response to reference later during current session
-    req.session.login_response = create_oidc_response(req);
-
-    if (Array.isArray(req.session.login_response)) {   
-      //errors were found, so return the errors
-      res.send(req.session.login_response);
-    } else {
-      //no errors, send the OIDC Login Response
-      res.redirect(url.format({
-        pathname: platform.consumerAuthorizationURL, 
-        query: req.session.login_response
-      }));
-    }
-  });
+  //TOOL:  OpenID Connect validation flow
+  create_oidc_response(req, res);
 });
 
 app.post("/oauth2/token", (req, res) => {
-  //Route not currently being used
+  //LIBRARY:  Route not currently being used
   var errors = valid_oauth2_request(req);
   tokenMaker(errors, res);
 });
 
+
+/*
+* Routes below are for running the Tool itself
+*/
 app.post("/project/submit", (req, res) => {
-  //Ensure Validity of OIDC Launch Request before launching Tool
-  if (is_valid_oidc_launch(req)) {
-    //Save OIDC Launch Request for later reference during current session
-    req.session.payload = req.body;
-    launchTool(req, res, '/project/submit');
-  } else {
-    res.send('invalid request');
-  }
+  //TOOL:  Validate and launch Tool
+  launchTool(req, res, '/project/submit');
 });
 
 app.get("/project/submit", (req, res) => {
-  //Display the Project Submission page
+  //TOOL:  Display the Project Submission page
   res.render("submit", {
     payload: req.session.payload, 
     formData: req.body.formData
@@ -149,27 +126,36 @@ app.get("/project/submit", (req, res) => {
 });
 
 app.post(`/project/grading`, (req, res) => {
-  //Grade the project and if there aren't errors with the grading, send the score.  Re-render Grading page.
+  //TOOL:  Grade the project and send the score if no errors; re-render Grading page.
   grade_project(req)
-    .then(grading => {
-      if (!grading.error) {
-        send_score(grading.grade, req.session.decoded_launch)
-      }
-      res.render("submit", {
-        payload: req.session.payload, 
-        formData: grading
-      });
+  .then(grading => {
+    if (!grading.error) {
+      send_score(grading.grade, req.session.decoded_launch)
+    }
+    res.render("submit", {
+      payload: req.session.payload, 
+      formData: grading
     });
+  });
 });
 
 app.post('/project/return', (req, res) => {
-  //When user is done with Tool, return to LMS 
+  //TOOL:  When user is done with Tool, return to Platform
   res.redirect(req.session.decoded_launch["https://purl.imsglobal.org/spec/lti/claim/launch_presentation"].return_url);
-  req.session.destroy();
+  req.session.destroy();   //TODO:  Make sure sessions are being destroyed in MongoDB
+});
+
+
+/*
+* The Routes below are for DEMO purposes
+*/
+app.get("/", (req, res) => {
+  //DEMO:  Shows OIDC Example data flow page
+  res.render("index");
 });
 
 app.get('/demo/oidc', (req, res) => {
-  //Sends an OIDC Login Response for demo purposes
+  //DEMO:  Sends an OIDC Login Response for demo purposes
   req.body = { 
     iss: 'https://demo.moodle.net',
     target_link_uri: 'https://node-lti-v1p3.herokuapp.com/',
@@ -181,18 +167,18 @@ app.get('/demo/oidc', (req, res) => {
 })
 
 app.get('/demo/project/submit', (req, res) => {
-  //Launches the Grading Tool for demo purposes
+  //DEMO:  Launches the Grading Tool for demo purposes
   let request_object = { nonce: 'g2f2cdPpYqPK7AwHcyXhjf5VL',
-    iat: 1564506231,
-    exp: 1564506291,
-    iss: 'https://demo.moodle.net',
-    aud: 'uuYLGWBmhhuZvBf',
-    'https://purl.imsglobal.org/spec/lti/claim/deployment_id': '2',
-    'https://purl.imsglobal.org/spec/lti/claim/target_link_uri': 'https://node-lti-v1p3.herokuapp.com//',
-    sub: '9',
-    'https://purl.imsglobal.org/spec/lti/claim/roles':
-     [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner' ],
-    'https://purl.imsglobal.org/spec/lti/claim/context':
+  iat: 1564506231,
+  exp: 1564506291,
+  iss: 'https://demo.moodle.net',
+  aud: 'uuYLGWBmhhuZvBf',
+  'https://purl.imsglobal.org/spec/lti/claim/deployment_id': '2',
+  'https://purl.imsglobal.org/spec/lti/claim/target_link_uri': 'https://node-lti-v1p3.herokuapp.com//',
+  sub: '9',
+  'https://purl.imsglobal.org/spec/lti/claim/roles':
+  [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner' ],
+  'https://purl.imsglobal.org/spec/lti/claim/context':
      { id: '47',
        label: 'AGILE200',
        title: 'Internship',
