@@ -40,41 +40,41 @@ app.use( (req,res,next) => {
 app.set("views", "./views");
 app.set("view engine", "ejs");
 
-/*
-* Setup MongoDB to store Platform data
+/** Setup MongoDB to store Platform data
 */
 mongoose.connect(process.env.MONGODB_URI/*'mongodb://localhost:27017/TESTLTI'*/, {
   useNewUrlParser: true, 
   auth: {
     user: process.env.MONGO_USER,
     password: process.env.MONGO_PASSWORD
-  }},
+  }
+},
   (err) => {
     if(err) {
       return console.log(err);
     }
 });
-
 mongoose.Promise = Promise;
   
-registerPlatform(
-  'https://www.sandiegocode.school',
-  'SanDiegocode.school',
-  'uuYLGWBmhhuZvBf',
-  'https://www.sandiegocode.school/mod/lti/auth.php',
-  'https://www.sandiegocode.school/mod/lti/token.php', 
-  { method: 'JWK_SET', key: 'https://www.sandiegocode.school/mod/lti/certs.php' }
-);
-  
+// registerPlatform(
+//   'https://www.sandiegocode.school',
+//   'SanDiegocode.school',
+//   'uuYLGWBmhhuZvBf',
+//   'https://www.sandiegocode.school/mod/lti/auth.php',
+//   'https://www.sandiegocode.school/mod/lti/token.php',
+//   'https://www.sandiegocode.school/project/submit',
+//   { method: 'JWK_SET', key: 'https://www.sandiegocode.school/mod/lti/certs.php' }
+// );
+
 registerPlatform(
   'https://demo.moodle.net',
   'Moodles demo',
-  'Naosq3H2J896F8G',
+  'CyKAucwWddL1wtH',
   'https://demo.moodle.net/mod/lti/auth.php',
-  'https://demo.moodle.net/mod/lti/token.php', 
+  'https://demo.moodle.net/mod/lti/token.php',
+  'https://node-lti-v1p3.herokuapp.com/project/submit',
   { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
 );
-
 
 /*
 * Setup Session to store data
@@ -89,6 +89,15 @@ app.use(session({
   httpOnly: true,
   store: new MongoStore({ mongooseConnection: mongoose.connection })
 }));
+
+app.get("/", (req, res) => {
+  res.render("index");
+});
+
+app.post("/", (req, res) => {
+  console.log(req.body);
+});
+
 
 /*
 * Routes below are for OAuth, OIDC, and Token usage
@@ -145,7 +154,6 @@ app.post('/project/return', (req, res) => {
   res.redirect(req.session.decoded_launch["https://purl.imsglobal.org/spec/lti/claim/launch_presentation"].return_url);
   req.session.destroy();   //TODO:  Make sure sessions are being destroyed in MongoDB
 });
-
 
 /*
 * The Routes below are for DEMO purposes

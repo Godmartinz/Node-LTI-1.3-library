@@ -32,7 +32,7 @@ function valid_oauth2_request(req) {
     if (!body.hasOwnProperty('client_id')) {
       errors.push('client id missing')
     } else {
-      if (body.client_id !== process.env.CLIENT_ID) {
+      if (body.client_id !== body.consumerToolClientID) {
         errors.push('client id invalid')
       }
     }
@@ -42,7 +42,7 @@ function valid_oauth2_request(req) {
     if (!body.hasOwnProperty('client_secret')) {
       errors.push('client secret missing')
     } else {
-      if (body.client_secret !== process.env.CLIENT_SECRET) {
+      if (body.client_secret !== body.privateKey) {
         errors.push('client secret invalid')
       }
     }
