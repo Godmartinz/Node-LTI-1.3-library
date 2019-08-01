@@ -44,13 +44,14 @@ app.set("view engine", "ejs");
 * Setup MongoDB to store Platform data
 */
 mongoose.connect('mongodb://localhost:27017/TESTLTI', {
-  useNewUrlParser: true},
-  (err) => {
-    if(err) {
-      return console.log(err);
-    }
-  }
-);
+
+//mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true, 
+  auth: {
+    user: process.env.MONGO_USER,
+    password: process.env.MONGO_PASSWORD
+  }},
+});
 mongoose.Promise = Promise;
   
 registerPlatform(
