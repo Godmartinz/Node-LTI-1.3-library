@@ -53,23 +53,14 @@ function create_oidc_response(req) {
       scope: 'openid',
       response_type: 'id_token',
       client_id: req.session.platform_DBinfo.consumerToolClientID,
-<<<<<<< HEAD
       redirect_uri: req.session.platform_DBinfo.consumerRedirect_URI,
-=======
-      redirect_uri: req.session.platform_DBinfo.redirect_URI,
->>>>>>> dced269c68588d362cbe070992630f6962ee435f
       login_hint: req.body.login_hint,
       state: create_unique_string(30, true),
       response_mode: 'form_post',
       nonce: create_unique_string(25, false),
       prompt: 'none'
     };
-<<<<<<< HEAD
 
-=======
-    console.log('response')
-    console.log(response); // take out
->>>>>>> dced269c68588d362cbe070992630f6962ee435f
     if (req.body.hasOwnProperty('lti_message_hint')) {
       response = {
         ...response,

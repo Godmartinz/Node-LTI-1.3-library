@@ -3,23 +3,6 @@ const axios = require('axios');
 const qs = require('qs');
 const app = require('../server/server.js');
 require('dotenv').config();
-const Database = require('./mongoDB/Database.js');
-const Schema = mongoose.Schema;
-
-const platformSchema = new Schema({
-  consumerUrl: String,
-  consumerName: String,
-  consumerToolClientID: String,
-  consumerAuthorizationURL: String,
-  consumerAccessTokenURL: String,
-  consumerRedirect_URI: String,
-  kid: Array,
-  consumerAuthorizationconfig: {
-    method: String,
-    key: String
-  }
-});
-let platformData = Database.Get('platform', platformSchema, { consumerURL: 'thisNeedsMockData'})
 
 describe('OAuth2.0 flow', function() {
   let httpServer = null;
@@ -32,7 +15,7 @@ describe('OAuth2.0 flow', function() {
     good_data = {
       'grant_type': 'client_credentials',
       'client_id': 'uuYLGWBmhhuZvBf',
-      'client_secret': process.env.CLIENT_SECRET
+      'client_secret': 'iubsd98hqwobv-9qhvb8eqewv9hsdv'
     };
   });
   
@@ -90,7 +73,7 @@ describe('OAuth2.0 flow', function() {
       headers: { 'content-type': 'application/x-www-form-urlencoded' },
       data: qs.stringify({
         'grant_type': 'client_credentials',
-        'client_secret': process.env.CLIENT_SECRET
+        'client_secret': 'alisdbvibq87b9v03qrovbasvb83qrbvbacuvbd'
         })
       })
     .catch(err => {
