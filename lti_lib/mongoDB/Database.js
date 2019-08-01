@@ -10,13 +10,13 @@ class Database {
       if (err) {
         return console.log(`Error finding platform: ${err}`);
       } else {
-        platformData = [registeredPlatform];
+        platformData = [...registeredPlatform];
       }
     });
     return platformData;
   };
 
-  static async GetPublicKey(collection, platformSchema, query) {
+  static async GetKey(collection, platformSchema, query) {
     let Model = mongoose.model(collection, platformSchema);
     let publicKey = [];
 
@@ -24,7 +24,7 @@ class Database {
       if (err) {
         return console.log(`Error finding public key for: ${query.consumerURL}`);
       } else {
-        publicKey = key[0].kid[0].publicKey;
+        publicKey = key[0].kid[0];
       }
     });
     return publicKey;

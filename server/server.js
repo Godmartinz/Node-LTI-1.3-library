@@ -33,13 +33,12 @@ app.use( (req,res,next) => {
 app.set("views", "./views");
 app.set("view engine", "ejs");
 
-
-mongoose.connect(process.env.MONGODB_URI, {
+mongoose.connect(/*process.env.MONGODB_URI*/'mongodb://localhost:27017/TESTLTI', {
   useNewUrlParser: true, 
-  auth: {
+  /*auth: {
     user: process.env.MONGO_USER,
     password: process.env.MONGO_PASSWORD
-  }},
+  }*/},
   (err) => {
     if(err) {
       return console.log(err);
@@ -59,12 +58,23 @@ mongoose.connect(process.env.MONGODB_URI, {
 registerPlatform(
   'https://demo.moodle.net',
   'Moodles demo',
-  'BMe642xnf4ag3Pd',
+  'J8DHVuJKFdjlGRh',
   'https://demo.moodle.net/mod/lti/auth.php',
   'https://demo.moodle.net/mod/lti/token.php',
-  'https://demo.moodle.net/<tool launch url>',
+  'https://piedpiper10.localtunnel.me/project/submit',
   { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
 );
+
+app.use(session({
+  name: 'lti_v1p3_library',
+  secret: 'iualcoelknasfnk',
+  saveUninitialized: true,
+  resave: true,
+  secure: true,
+  ephemeral: true,
+  httpOnly: true,
+  store: new MongoStore({ mongooseConnection: mongoose.connection })
+}));
 
 app.get("/", (req, res) => {
   res.render("index");
@@ -85,7 +95,6 @@ app.post('/oidc', (req, res) => {
 
   Database.Get('platforms', platformSchema, { consumerUrl: req.session.login_request.iss })
   .then(dbResult => {
-console.log(dbResult); // take out
     if (dbResult.length === 1) return dbResult[0]
     else res.send(['Issuer invalid: not registered']);
   }).then(platform => {

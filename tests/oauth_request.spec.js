@@ -3,6 +3,23 @@ const axios = require('axios');
 const qs = require('qs');
 const app = require('../server/server.js');
 require('dotenv').config();
+const Database = require('./mongoDB/Database.js');
+const Schema = mongoose.Schema;
+
+const platformSchema = new Schema({
+  consumerUrl: String,
+  consumerName: String,
+  consumerToolClientID: String,
+  consumerAuthorizationURL: String,
+  consumerAccessTokenURL: String,
+  consumerRedirect_URI: String,
+  kid: Array,
+  consumerAuthorizationconfig: {
+    method: String,
+    key: String
+  }
+});
+let platformData = Database.Get('platform', platformSchema, { consumerURL: 'thisNeedsMockData'})
 
 describe('OAuth2.0 flow', function() {
   let httpServer = null;

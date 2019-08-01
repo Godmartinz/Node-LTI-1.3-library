@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
  the tokenMaker() should be called in route block that handles the Oauth token validiation. */
 
 function tokenMaker(errors, res) {
+  // let keys = Database.Get('platforms', platformSchema, {consumerUrl: })
   
   if (errors.length === 0) {
     // no errors
