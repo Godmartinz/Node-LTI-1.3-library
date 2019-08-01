@@ -33,11 +33,15 @@ function is_valid_oidc_login(req) {
 * @return if invalid request, returns array of errors with the request
 */
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 function create_oidc_response(req, res) {
   let errors = [];
 
 =======
+=======
+
+>>>>>>> Gd flow fix (#53)
 function create_oidc_response(req, res) {
   let errors = [];
 

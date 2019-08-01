@@ -10,7 +10,11 @@ const platformSchema = new Schema({
   consumerAuthorizationURL: String,
   consumerAccessTokenURL: String,
   consumerRedirect_URI: String,
+<<<<<<< HEAD
   kid: Object,
+=======
+  kid: Array,
+>>>>>>> Gd flow fix (#53)
   consumerAuthorizationconfig: {
     method: String,
     key: String
@@ -37,6 +41,7 @@ const registerPlatform = async (
   let existingPlatform;
 
   //checks database for existing platform.
+<<<<<<< HEAD
   await Database.Get('platforms', platformSchema,{ 'consumerUrl': consumerUrl })
   .then( (registeringPlatform) => {
     if (typeof registeringPlatform === 'undefined' || registeringPlatform.length === 0) {
@@ -62,6 +67,26 @@ const registerPlatform = async (
 })
 .catch(err => console.log(`Error finding platform: ${err}`));
 return existingPlatform;
+=======
+  if (existingPlatform.length === 1) {
+    return existingPlatform;
+  } else {
+    const keyPairs = keyGenerator();
+
+    // .Insert() method accepts ('platforms', platformSchema, objectToInsert { consumerUrl: consumerUrl, ...})
+    Database.Insert('platforms', platformSchema, { 
+      'consumerUrl': consumerUrl,
+      'consumerName': consumerName,
+      'consumerToolClientID': consumerToolClientID,
+      'consumerAuthorizationURL': consumerAuthorizationURL,
+      'consumerAccessTokenURL': consumerAccessTokenURL,
+      'consumerRedirect_URI': consumerRedirect_URI,
+      'kid': keyPairs,
+      'consumerAuthorizationconfig': consumerAuthorizationconfig,
+    });
+    return console.log(`Platform registered at: ${consumerUrl}`);
+  };
+>>>>>>> Gd flow fix (#53)
 };
 
 module.exports = { platformSchema, registerPlatform };
