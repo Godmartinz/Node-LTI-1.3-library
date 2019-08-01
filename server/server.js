@@ -70,7 +70,7 @@ mongoose.Promise = Promise;
 registerPlatform(
   'https://demo.moodle.net',
   'Moodles demo',
-  'owpQ2MHODDeg11E', // testing
+  'owpQ2MHODDeg11E',
   'https://demo.moodle.net/mod/lti/auth.php',
   'https://demo.moodle.net/mod/lti/token.php',
   'https://piedpiper10.localtunnel.me/project/submit',
