@@ -1,8 +1,11 @@
 const mongoose = require('mongoose');
 
+/*
+* Database class to maintain and access Platform information
+*/
 class Database {
 
-  // TODO: incorperate encryption for stored platform keys.
+  // TODO: incorporate encryption for stored platform keys.
   static async Get(collection, platformSchema, query) {
     let Model = mongoose.model(collection, platformSchema);
     let platformData = [];
@@ -17,7 +20,7 @@ class Database {
     return platformData;
   };
 
-  // TODO: incorperate encryption for stored platform keys.
+  // TODO: incorporate encryption for stored platform keys.
   static Insert(collection, platformSchema, platform) {
     let Model = mongoose.model(collection, platformSchema);
 

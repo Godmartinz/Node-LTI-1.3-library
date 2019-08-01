@@ -2,9 +2,9 @@ const { generateKeyPairSync } = require("crypto");
 const crypto = require("crypto");
 
 /*
-The Key Generator creates a pair of rsa keys to validate a session between the LMS and the Platform.
+* Creates a unique pass phrase
+* @returns phrase
 */
-
 function passPhrase() {
   var phrase = "";
   var characters =
@@ -15,7 +15,12 @@ function passPhrase() {
   
   return phrase.toString();
 }
-//The signature and the verification needs to be updated with a proper consumerID or some other unique identifer
+
+/*
+* Generate RSA public and private key pair to validate between Tool and the Platform
+* @returns key pair
+*  NOTE: The signature and the verification needs to be updated with a proper consumerID or some other unique identifer
+*/
 function keyGenerator() {
   var keys = [];
 
@@ -52,4 +57,4 @@ function keyGenerator() {
   return keys;
 }
 
-module.exports = { keyGenerator };
+module.exports = { keyGenerator, passPhrase };

@@ -16,6 +16,11 @@ const platformSchema = new Schema({
   }
 });
 
+/*
+* Register a new Platform for the Tool
+* @params - all of the Platform/Tool fields shown below
+* @returns Platform object, if Platform is already registered
+*/
 const registerPlatform = async (
   consumerUrl, /* Base url of the LMS. */
   consumerName, /* Domain name of the LMS. */
