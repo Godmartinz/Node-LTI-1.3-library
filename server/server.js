@@ -40,10 +40,8 @@ app.use( (req,res,next) => {
 app.set("views", "./views");
 app.set("view engine", "ejs");
 
-/*
-* Setup MongoDB to store Platform data
+/** Setup MongoDB to store Platform data
 */
-
 mongoose.connect(process.env.MONGODB_URI/*'mongodb://localhost:27017/TESTLTI'*/, {
   useNewUrlParser: true, 
   auth: {
@@ -76,7 +74,7 @@ registerPlatform(
   'https://demo.moodle.net/mod/lti/token.php',
   'https://node-lti-v1p3.herokuapp.com/project/submit',
   { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
-); 
+);
 
 /*
 * Setup Session to store data
