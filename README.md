@@ -41,7 +41,28 @@ npm install node-lti-v1p3
 
 ### Setup Server and Routes
 
+<<<<<<< HEAD
 This library requires the use of an Express server.  Setup a basic Express server add middleware, and routes within your server.js file to launch your Tool.  You can refer to the server.js example file in our Example Tool.
+=======
+This library requires MongoDB.  If you do not currently have MongoDB setup, follow these instructions.
+
+< TODO:  add instructions for installing MongoDB for new users >
+
+Once you have MongoDB setup and have a server, you need to add the following to your server.js file:
+```
+mongoose.connect('mongodb://localhost:27017/TESTLTI', {
+  useNewUrlParser: true},
+  (err) => {
+    if(err) {
+      return console.log(err);
+    }
+  }
+);
+mongoose.Promise = Promise;
+```
+
+### 3. Setup Server and Routes
+>>>>>>> separates library functions from Tool and from Demo code (#48)
 
 In addition, add the following to your server:
 
@@ -70,6 +91,7 @@ app.post('/oidc', (req, res) => {
 ```
 app.post('/project/submit', (req, res) => {
     launchTool(req, res, < route to add to Base URL, if any >);
+<<<<<<< HEAD
 });
 ```
 
@@ -81,14 +103,20 @@ app.post('/auth_code', (req, res) => {
   } else {
     res.status(401).send('Access denied: ' + req.params.error);
   }
+=======
+>>>>>>> separates library functions from Tool and from Demo code (#48)
 });
 ```
 
 *Within your Tool's route where grading is performed, set up the score to be returned to the Platform.*
 This initiates the score submission, which will end at the above /auth_code route where the score is finally sent
 ```
+<<<<<<< HEAD
   req.session.grade = < student's grade >;
   res.redirect(307, prep_send_score(req));
+=======
+  send_score(< student's score >, req.session.decoded_launch)
+>>>>>>> separates library functions from Tool and from Demo code (#48)
 ```
 
 *Route to return from Tool to Platform*

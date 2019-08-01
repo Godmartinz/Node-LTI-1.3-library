@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+require('dotenv').config();
+>>>>>>> separates library functions from Tool and from Demo code (#48)
 const url = require('url');    
 const Database = require('../lti_lib/mongoDB/Database.js');
 const { platformSchema } = require('../lti_lib/register_platform');
@@ -28,10 +32,16 @@ function is_valid_oidc_login(req) {
 * @returns if valid request, returns properly formated response object
 * @return if invalid request, returns array of errors with the request
 */
+<<<<<<< HEAD
 
 function create_oidc_response(req, res) {
   let errors = [];
 
+=======
+function create_oidc_response(req, res) {
+  let errors = [];
+
+>>>>>>> separates library functions from Tool and from Demo code (#48)
   //Save the OIDC Login Request to reference later during current session
   req.session.login_request = req.body;
 
@@ -51,7 +61,11 @@ function create_oidc_response(req, res) {
         scope: 'openid',
         response_type: 'id_token',
         client_id: req.session.platform_DBinfo.consumerToolClientID,
+<<<<<<< HEAD
         redirect_uri: req.session.platform_DBinfo.consumerRedirect_URI,
+=======
+        redirect_uri: process.env.REDIRECT_URI,     // TODO: store in DB per Issuer (Consumer)?
+>>>>>>> separates library functions from Tool and from Demo code (#48)
         login_hint: req.body.login_hint,
         state: create_unique_string(30, true),
         response_mode: 'form_post',
@@ -97,4 +111,8 @@ function create_unique_string(length, signed) {
   return unique_string;
 }
 
+<<<<<<< HEAD
 module.exports = { create_oidc_response, create_unique_string };
+=======
+module.exports = { create_oidc_response };
+>>>>>>> separates library functions from Tool and from Demo code (#48)
