@@ -43,6 +43,7 @@ app.set("view engine", "ejs");
 /*
 * Setup MongoDB to store Platform data
 */
+
 mongoose.connect(process.env.MONGODB_URI/*'mongodb://localhost:27017/TESTLTI'*/, {
   useNewUrlParser: true, 
   auth: {
@@ -54,7 +55,6 @@ mongoose.connect(process.env.MONGODB_URI/*'mongodb://localhost:27017/TESTLTI'*/,
       return console.log(err);
     }
 });
-
 mongoose.Promise = Promise;
   
 // registerPlatform(
@@ -62,19 +62,20 @@ mongoose.Promise = Promise;
 //   'SanDiegocode.school',
 //   'uuYLGWBmhhuZvBf',
 //   'https://www.sandiegocode.school/mod/lti/auth.php',
-//   'https://www.sandiegocode.school/mod/lti/token.php', 
+//   'https://www.sandiegocode.school/mod/lti/token.php',
+//   'https://www.sandiegocode.school/project/submit',
 //   { method: 'JWK_SET', key: 'https://www.sandiegocode.school/mod/lti/certs.php' }
 // );
-  
+
 registerPlatform(
   'https://demo.moodle.net',
   'Moodles demo',
   'okeWsLDgrhlRwPS',
   'https://demo.moodle.net/mod/lti/auth.php',
-  'https://demo.moodle.net/mod/lti/token.php', 
+  'https://demo.moodle.net/mod/lti/token.php',
+  'https://piedpiper10.localtunnel.me/project/submit',
   { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
 );
-
 
 /*
 * Setup Session to store data
@@ -89,6 +90,15 @@ app.use(session({
   httpOnly: true,
   store: new MongoStore({ mongooseConnection: mongoose.connection })
 }));
+
+app.get("/", (req, res) => {
+  res.render("index");
+});
+
+app.post("/", (req, res) => {
+  console.log(req.body);
+});
+
 
 /*
 * Routes below are for OAuth, OIDC, and Token usage
