@@ -8,10 +8,10 @@ const mongoose = require('mongoose');
 //Required Library methods
 const { registerPlatform } = require('../lti_lib/register_platform');
 const { valid_oauth2_request } = require("../lti_lib/oauth2_validation");
-const { create_oidc_response } = require("../lti_lib/oidc");
+const { create_oidc_response, create_unique_string } = require("../lti_lib/oidc");
 const { launchTool } = require("../lti_lib/launch_validation");
 const { tokenMaker } = require("../lti_lib/token_generator");
-const { send_score } = require("../lti_lib/student_score");
+const { prep_send_score, send_score } = require("../lti_lib/student_score");
 
 //Required Tool methods
 const { grade_project } = require("../tool/grading_tool");
@@ -119,6 +119,13 @@ app.post("/oauth2/token", (req, res) => {
   tokenMaker(errors, res);
 });
 
+app.post('/auth_code', (req, res) => {
+  if (!req.body.error) {
+    send_score(req, req.session.grade, 1);
+  } else {
+    res.status(401).send('Access denied: ' + req.params.error);
+  }
+});
 
 /*
 * Routes below are for running the Tool itself
@@ -141,7 +148,9 @@ app.post(`/project/grading`, (req, res) => {
   grade_project(req)
   .then(grading => {
     if (!grading.error) {
-      send_score(grading.grade, req.session.decoded_launch)
+      req.session.grade = grading.grade;
+      // const redir = prep_send_score(req);
+      // res.redirect(307, redir);
     }
     res.render("submit", {
       payload: req.session.payload, 
@@ -173,7 +182,17 @@ app.get('/demo/oidc', (req, res) => {
     lti_message_hint: '377' 
   };
   req.session.platform_DBinfo = {'consumerToolClientID': 'SDF7ASDLSFDS9'};
-  res.send(create_oidc_response(req));
+  res.send({
+    scope: 'openid',
+    response_type: 'id_token',
+    client_id: req.session.platform_DBinfo.consumerToolClientID,
+    redirect_uri: 'https://piedpiper.localtunnel.me/project/submit',
+    login_hint: req.body.login_hint,
+    state: create_unique_string(30, true),
+    response_mode: 'form_post',
+    nonce: create_unique_string(25, false),
+    prompt: 'none'
+  });
 })
 
 app.get('/demo/project/submit', (req, res) => {

@@ -1,4 +1,4 @@
-# LTI 1.3 Compliant Library for External Tool Integration
+# LTI 1.3 Compliant NodeJS Library for External Tool Integration
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -14,17 +14,18 @@ Follow these steps to implement this Library:
 
 0. Develop a Tool
 1. Install Library
-2. Setup MongoDB
-3. Setup Server and Routes
+2. Setup Server and Routes
+3. Setup MongoDB
 4. Add Tool to Platform
 5. Register Platform with Tool
 6. Run your Server
 
 Optionally, you can:
 
-- View the OIDC Tool Launch Flow
-- Use the Test Suite
-- View the Glossary
+A. View the OIDC Tool Launch Flow
+B. Use Example Tool
+C. Use the Test Suite
+D. View the Glossary
 
 ### 0. Develop a Tool
 
@@ -38,28 +39,9 @@ To install this Library, use the Node Package Manager (NPM) and run in your term
 npm install node-lti-v1p3
 ```
 
-### 2. Setup MongoDB
+### 2. Setup Server and Routes
 
-This library requires MongoDB.  If you do not currently have MongoDB setup, follow these instructions.
-
-< TODO:  add instructions for installing MongoDB for new users >
-
-Once you have MongoDB setup and have a server, you need to add the following to your server.js file:
-```
-mongoose.connect('mongodb://localhost:27017/TESTLTI', {
-  useNewUrlParser: true},
-  (err) => {
-    if(err) {
-      return console.log(err);
-    }
-  }
-);
-mongoose.Promise = Promise;
-```
-
-### 3. Setup Server and Routes
-
-This library requires the use of an Express server.  Setup a basic Express server, add middleware, and routes within your server.js file to launch your Tool:
+This library requires the use of an Express server.  Setup a basic Express server, add middleware, and routes within your server.js file to launch your Tool.  You can refer to the server.js example file in our Example Tool.
 
 *Middleware to store session information*
 ```
@@ -82,16 +64,29 @@ app.post('/oidc', (req, res) => {
 });
 ```
 
-*Route to Handle Tool Launches, must provide 'route to add to Base URL' if needed*
+*Route to Handle Tool Launches, 'route to add to Base URL' can be an empty string if unneeded*
 ```
 app.post('/project/submit', (req, res) => {
     launchTool(req, res, < route to add to Base URL, if any >);
 });
 ```
 
-*Send score back to Platform - add to your Tool wherever grade is finalized*
+*Route to send score back to Platform*
 ```
-  send_score(< student's score >, req.session.decoded_launch)
+app.post('/auth_code', (req, res) => {
+  if (!req.body.error) {
+    send_score(req, req.session.grade, < maximum grade allowed >);
+  } else {
+    res.status(401).send('Access denied: ' + req.params.error);
+  }
+});
+```
+
+*Within your Tool's route where grading is performed, set up the score to be returned to the Platform.*
+This initiates the score submittal, which will end at the above /auth_code route where the score is finally sent
+```
+  req.session.grade = < student's grade >;
+  res.redirect(307, prep_send_score(req));
 ```
 
 *Route to return from Tool to Platform*
@@ -100,6 +95,32 @@ app.post('/project/return', (req, res) => {
   res.redirect(req.session.decoded_launch["https://purl.imsglobal.org/spec/lti/claim/launch_presentation"].return_url);
   req.session.destroy();
 });
+```
+
+### 3. Setup MongoDB
+
+This library requires MongoDB.  If you do not currently have MongoDB setup, follow these instructions.
+
+* MacOS - use homebrew: https://docs.mongodb.com/master/tutorial/install-mongodb-on-os-x/
+* Windows - use the installer from here: https://docs.mongodb.com/master/tutorial/install-mongodb-on-windows/
+
+Once you have MongoDB setup, make note of your MongoDB URI, username, and password. You will need to set these up as environment variables either in your production environment or in your development .env file.  
+
+Add the following to your server.js file:
+```
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true, 
+  auth: {
+    user: process.env.MONGO_USER,
+    password: process.env.MONGO_PASSWORD
+  }
+},
+  (err) => {
+    if(err) {
+      return console.log(err);
+    }
+});
+mongoose.Promise = Promise;
 ```
 
 ### 4. Add Tool to Platform
@@ -111,18 +132,17 @@ Within the Platform, the Site Administrator needs to setup the External Tool.  F
 - Tool's Description, if desired
 - Mark the tool as a 'LTI1.3' Tool
 - Tool's Public Key -- you will need to come back and add this in a moment, see below about generating a Public/Private key pair
-- Initiate Login URL - <Tool Base URL> + '/oidc'
-- Redirection URIs - all of the endpoints that may be use, for example <Tool Base URL>/project/submit
+- Initiate Login URL - < Tool Base URL > + '/oidc'
+- Redirection URIs - all of the endpoints that may be used, for example < Tool Base URL >/project/submit
 - Enable Assignment and Grade Services, if Tool should send grades to Platform
-- Enable Names and Role Provisioning Services, if Tool should be able to access user information from Platform
 - Enable sharing of launcher's name, if Tool should have ability to display this information
 - Choose 'Always' Accept grades from the Tool, if Tool should send grades to Platform  
 
-After saving the External Tool, the Platform should assign a Client ID to the Tool and provide endpoints.  Make note of all of this information as it will be used in Step 4.  
+After saving the External Tool, the Platform will assign a Client ID to the Tool and provide endpoints.  Make note of all of this information as it will be used in Step 5.  
 
 ### 5. Register Platform with Tool
 
-In order register a Platform with the Tool, add a call to `registerPlatform` in your server file, with the values you received from Step 3.
+In order register a Platform with the Tool, add a call to `registerPlatform` in your server file, with the values you received from Step 4.
 ```
 registerPlatform(
   consumerUrl, /* Base url of the Platform. */
@@ -130,6 +150,7 @@ registerPlatform(
   consumerToolClientID, /* Client ID of the Tool, created from the Platform. */
   consumerAuthorizationURL, /* URL that the Tool sends OIDC Launch Responses to. */
   consumerAccessTokenURL, /* URL that the Tool can use to obtain an access token/login. */
+  consumerRedirectURL /* URL where the Tool is launched from */
   consumerAuthorizationconfig, /* Authentication method and key for verifying messages from the Platform. */
 );
 ```
@@ -141,31 +162,36 @@ registerPlatform(
   'BMe642xnf4ag3Pd',
   'https://demo.moodle.net/mod/lti/auth.php',
   'https://demo.moodle.net/mod/lti/token.php', 
+  'https://piedpiper.localtunnel.me/project/submit',
   { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
 );
 ```
 
 ### 6. Run your Server
 
-Once the Tool is integrated with the Platform, your server must be up and running so that the Tool can be accessed. In a development environment, start your server in a terminal:
+Once the Tool is integrated with the Platform, your server must be up and running so that the Tool can be accessed. In a development environment, start your MongoDB and your server in separate terminals:
+
 ```
+mongod
 npm start
 ```
-You need to access the generated Client Public key by making a GET request to `<your base URL>/publickey` (TODO:  verify endpoint when implemented).  This key must be put into the Tool's Public Key field in Step 4 above on the Platform.
+
+Now that your server is running, you are able to access the Tool's generated Client Public key by making a GET request to `<your base URL>/publickey` (TODO:  verify endpoint when implemented).  This key must be put into the Tool's Public Key field in Step 4 above on the Platform.  
 
 ---
 
 ### 7. Optional Activities
 
-#### View the OIDC Tool Launch Flow
+#### A. View the OIDC Tool Launch Flow
 
-The Tool example illustrates how the Library can be utilized to drop a Tool into a Platform.  In order to run the example, start the Express server by running in your terminal:
+The Example Tool contains an illustration of the Authorization flow which occurs within the Library when you drop a Tool into a Platform.  In order to run the example, start the MongoDB and your Express server by running in separate terminals:
 
 ```
+mongod
 npm start
 ```
 
-The Tool example will run on `http://localhost:3000/` in your browser.  The example walks through what occurs behind-the-scenes during an LTI1.3 Tool launch.  It is important to understand that the Platform users (students, teachers) do not see any of this flow, this all occurs behind the scenes.  Also, the Tool on this page is just an example, see the next section for how you can implement the Example Tool in a running Platform.
+The Example Tool will run on `http://localhost:3000/` in your browser.  The example walks through what occurs behind-the-scenes during an LTI1.3 Tool launch.  It is important to understand that the Platform users (students, teachers) do not see any of this flow, this all occurs behind the scenes.  Also, the Tool on this page is a mockup and not fully functional, see the next section for how you can implement the functional Example Tool in a running Platform.
 
 ##### View Behind the Scenes Launch Flow
 
@@ -189,7 +215,8 @@ The Tool example will run on `http://localhost:3000/` in your browser.  The exam
 >   'nonce': 'oNa1yWsS8erQA2iYqYzEi4pbP', 
 >   'prompt': 'none', 
 >   'lti_message_hint': '377' }
-> 
+> ```
+>
 > 3. The Platform will validate the login response and initiate the Tool launch by sending a JWT, which the Library decodes to an object like:
 > 
 > ```java
@@ -243,7 +270,7 @@ The Tool example will run on `http://localhost:3000/` in your browser.  The exam
 >      service_versions: [ '1.0', '2.0' ] } }
 > ```
 > 
-> 4. If a valid request was sent, it will redirect the student to the Tool.  Note:  The Tool is not operational in this demo.
+> 4. If a valid request was sent, it will redirect the student to the Tool.  Note:  The Tool is **not** operational in this demo.
 
 ##### Generate Access Token
 
@@ -251,21 +278,21 @@ The Tool example will run on `http://localhost:3000/` in your browser.  The exam
 > 
 > ```java
 > {
->   sub: <your Tool's Client ID>,
+>   sub: < your Tool's Client ID >,
 >   expires_in: 3600,             // 1 hour per LTI1.3 spec
 >   token_type: 'bearer',
->   scope: <valid scope being requested>
+>   scope: < valid scope being requested >
 > }
 > ```
 > If successful, the example will display the token authorizing the Tool to have access to the Platform's API.  This token is secured as a JWT, so the Platform will be able to verify the JWT on their side with the public key.
 > 
 > If you want to view the JSON object that is being passed through the JWT, copy the token and paste it into the 'JWT String box' on https://www.jsonwebtoken.io/.  This will enable you to view the JSON object on the Payload.
 
-##### Use Example Tool
+##### B. Use Example Tool
 
-> Now that you understand the flow of messages, the example Tool can be dropped into a Platform so that you can experience the Library's usage in a live environment.  For example, you can use the setup instructions above to Register the Tool with the Platform and vice/versa within Moodle's sandbox.  
+> Now that you understand the flow of messages, the Example Tool can be dropped into a Platform so that you can experience the Library's usage in a live environment.  For instance, you can use the setup instructions above to Register the Tool with the Platform and vice/versa within Moodle's sandbox.  
 > 
-> The example Tool is a Project Submission Grader.  When the Tool is launched, the student will see a form where they can enter a Github URL and a Heroku and/or Now URL.  After the student enters the URLs of their project and clicks Submit, the Tool will grade the project. 
+> The Example Tool is a Project Submission Grader.  When the Tool is launched, the student will see a form where they can enter a Github URL and a Heroku and/or Now URL.  After the student enters the URLs of their project and clicks Submit, the Tool will grade the project. 
 > 
 >   In order to Submit a project, URLs should be formatted similar to:
 >     
@@ -275,33 +302,35 @@ The Tool example will run on `http://localhost:3000/` in your browser.  The exam
 > 
 > If the URLs are not properly formatted and/or the GitHub URL doesn't launch successfully, the student will see an error message.  With a valid project, when the student clicks Submit, s/he will be shown the resulting grade and the Tool uses the Library to pass the grade back to the Platform.
 > 
-> Finally, when the student clicks Done, the student is returned to the Platform.  The Teacher or Administrator on the Platform should be able to see that a grade has been used for test student for the example Tool.
+> Finally, when the student clicks Done, the student is returned to the Platform.  The Teacher or Administrator on the Platform should be able to see that a grade has been used for test student for the Example Tool.
 
 
 ---
 
-#### Test Suite
+#### C. Test Suite
 
-The Tool example provides a test suite to verify portions of the basic functionality of the Library.  
+The Library provides a test suite to verify portions of the basic functionality.  
 
 The tests require the use of a .env file, which if you are new to Node, is a a simple configuration text file that is used to pass customized variables into your application’s environment. 
 
-You will need to load the test data in your .env file for the follwoing.  You can use LMS Global's Reference Implementation Tool to generate keys (https://lti-ri.imsglobal.org/keygen/index).
-* CLIENT_ID=client12345
-* CLIENT_SECRET=<RSA Private Key>
-* CLIENT_PUBLIC=<Public Key>
+You will need to load the test data in your .env file for the following:
 
-Make sure that your .env file is listed in your .gitignore if you are using live key pairs.
+* MONGO_URI=< your MongoDB URI >
+* MONGO_USER=< your MongoDB username >
+* MONGO_PASSWORD=< your MongoDB password >
 
-To launch the automated tests for this Library, run in your terminal:
+Make sure that your .env file is listed in your .gitignore file.
+
+To launch the automated tests for this Library, run in separate terminals:
 
 ```
+mongod
 npm test
 ```
 
 ---
 
-#### Glossary
+#### D. Glossary
 
 JWT - JSON Web Tokens (JWTs) are an open, industry standard that supports securely transmitting information between parties as a JSON object.  Signed tokens can verify the integrity of the claims contained within it.  (https://openid.net/specs/draft-jones-json-web-token-07.html).  
 
@@ -310,6 +339,8 @@ LTI - The IMS Learning Tools Interoperability specification allows Platforms to 
 LMS - Learning Management System.  Referred to as Platforms in this document.
 
 OAuth 2.0 - LTI 1.3 specifies the use of the OAuth 2.0 Client Credential Grant mechanism to secure web services between trusted systems.  This Library makes use of JSON Web Tokens, JWT, for the access tokens. (https://www.imsglobal.org/spec/security/v1p0) 
+
+OIDC - OpenID Connect is a simple identity layer on top of the OAuth 2.0 protocol. It allows Clients to verify the identity of the End-User based on the authentication performed by an Authorization Server, as well as to obtain basic profile information about the End-User in an interoperable and REST-like manner.  https://openid.net/connect/
 
 Platform - previously referred to as the Tool Consumer is the Learning Management System (LMS) that the educational provider is using.  Examples are Moodle, Blackboard, Edgenuity, Canvas, Schoology, etc.
 

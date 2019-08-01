@@ -136,38 +136,5 @@ describe('OAuth2.0 flow', function() {
     });
   });
 
-  // it('should make a GET successfully with a valid token', () => {
-  //   return axios.get(url+'/project/submit', {headers: {Authorization: 'Bearer ' + saved_token}})
-  //     .then(r => expect(r.status).to.equal(200))
-  //     .catch(error => console.log(`***error caught ${error}`));
-  // });
-
-  // it('should make a POST successfully with a valid token', () => {
-    //   const body = {
-    //     sub: 'a6d5c443-1f51-4783-ba1a-7686ffe3b54a',
-    //     'https://purl.imsglobal.org/spec/lti/claim/deployment_id': '07940580-b309-415e-a37c-914d387c1150',
-    //     'https://purl.imsglobal.org/spec/lti/claim/message_type': 'LtiResourceLinkRequest',
-    //     'https://purl.imsglobal.org/spec/lti/claim/version': '1.3.0',
-    //     'https://purl.imsglobal.org/spec/lti/claim/roles': 
-    //       [ 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student',
-    //         'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner',
-    //         'http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor' ],
-    //     'https://purl.imsglobal.org/spec/lti/claim/tool_platform': {
-    //         'url': "https://platform.example.edu",
-    //       },    
-    //     'https://purl.imsglobal.org/spec/lti/claim/resource_link': 
-    //       { id: '200d101f-2c14-434a-a0f3-57c2a42369fd',
-    //         description: 'Assignment to introduce who you are',
-    //         title: 'Introduction Assignment' } };
-    // return axios.post(url+'/project/submit/react100',
-    //       body, 
-    //       {headers: {
-    //         Authorization: 'Bearer ' + saved_token,
-    //         'Content-Type': 'application/json'
-    //       }}
-    //   )
-    //   .catch(r => expect(r.response.status).to.equal(200))
-    //   .catch(error => console.log(`***error caught ${error}`));
-  // });
 });
 

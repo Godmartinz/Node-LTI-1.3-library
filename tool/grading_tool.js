@@ -1,5 +1,11 @@
 const axios = require('axios');
 
+/*
+* Performs grading of a SDCS Project. Requirements are valid GitHub URL and Heroku/Now URL.  GitHub URL is tested to 
+* ensure it returns a 200 response
+* @param req
+* @returns grading object containing URLs submitted and results of grading, including status code, errors, and the grade
+*/
 async function grade_project(req) {
   const url = req.body;
   let grading = {

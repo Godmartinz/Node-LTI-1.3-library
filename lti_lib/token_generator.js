@@ -1,9 +1,12 @@
 require("dotenv").config();
 const jwt = require('jsonwebtoken');
 
-/* The Token Maker creates a JSON web token in accordance with the LTI 1.3 standard and in conjunction with Oauth 2.0 validation. 
- the tokenMaker() should be called in route block that handles the Oauth token validiation. */
-
+/* 
+* Creates a JSON web token in accordance with the LTI 1.3 standard and in conjunction with Oauth 2.0 validation. 
+* @param errors - errors array from validation
+* @param res - Result to send
+* @returns result with JWT, if successful, or an object with errors listed
+*/
 function tokenMaker(errors, res) {
   // let keys = Database.Get('platforms', platformSchema, {consumerUrl: })
   

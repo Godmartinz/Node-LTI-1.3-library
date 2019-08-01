@@ -98,4 +98,4 @@ function create_unique_string(length, signed) {
   return unique_string;
 }
 
-module.exports = { create_oidc_response };
+module.exports = { create_oidc_response, create_unique_string };
