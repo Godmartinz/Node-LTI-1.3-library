@@ -13,7 +13,7 @@ const { launchTool } = require("../lti_lib/launch_validation");
 const { tokenMaker } = require("../lti_lib/token_generator");
 const { send_score } = require("../lti_lib/student_score");
 
-//Reguired Tool methods
+//Required Tool methods
 const { grade_project } = require("../tool/grading_tool");
 
 /*
@@ -43,14 +43,16 @@ app.set("view engine", "ejs");
 /*
 * Setup MongoDB to store Platform data
 */
-mongoose.connect('mongodb://localhost:27017/TESTLTI', {
-
-//mongoose.connect(process.env.MONGODB_URI, {
+mongoose.connect(process.env.MONGODB_URI/*'mongodb://localhost:27017/TESTLTI'*/, {
   useNewUrlParser: true, 
   auth: {
     user: process.env.MONGO_USER,
     password: process.env.MONGO_PASSWORD
   }},
+  (err) => {
+    if(err) {
+      return console.log(err);
+    }
 });
 mongoose.Promise = Promise;
   
