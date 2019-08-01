@@ -33,12 +33,12 @@ app.use( (req,res,next) => {
 app.set("views", "./views");
 app.set("view engine", "ejs");
 
-mongoose.connect(/*process.env.MONGODB_URI*/'mongodb://localhost:27017/TESTLTI', {
+mongoose.connect(process.env.MONGODB_URI/*'mongodb://localhost:27017/TESTLTI'*/, {
   useNewUrlParser: true, 
-  /*auth: {
+  auth: {
     user: process.env.MONGO_USER,
     password: process.env.MONGO_PASSWORD
-  }*/},
+  }},
   (err) => {
     if(err) {
       return console.log(err);
