@@ -10,10 +10,10 @@ class Database {
       if (err) {
         return console.log(`Error finding platform: ${err}`);
       } else {
-        platformData = [registeredPlatform];
+        platformData = [...registeredPlatform];
       }
     });
-    return platformData;
+    return platformData; 
   };
 
   static async GetKey(collection, platformSchema, query) {

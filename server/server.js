@@ -44,12 +44,13 @@ app.set("view engine", "ejs");
 * Setup MongoDB to store Platform data
 */
 
-mongoose.connect(process.env.MONGODB_URI/*'mongodb://localhost:27017/TESTLTI'*/, {
+mongoose.connect(/*process.env.MONGODB_URI*/'mongodb://localhost:27017/TESTLTI', {
   useNewUrlParser: true, 
-  auth: {
+  /*auth: {
     user: process.env.MONGO_USER,
     password: process.env.MONGO_PASSWORD
-  }},
+  }*/
+},
   (err) => {
     if(err) {
       return console.log(err);
@@ -70,12 +71,12 @@ mongoose.Promise = Promise;
 registerPlatform(
   'https://demo.moodle.net',
   'Moodles demo',
-  'owpQ2MHODDeg11E', // testing
+  'CyKAucwWddL1wtH',
   'https://demo.moodle.net/mod/lti/auth.php',
   'https://demo.moodle.net/mod/lti/token.php',
-  'https://piedpiper10.localtunnel.me/project/submit',
+  'https://node-lti-v1p3.herokuapp.com/project/submit',
   { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
-);
+); 
 
 /*
 * Setup Session to store data
@@ -155,7 +156,6 @@ app.post('/project/return', (req, res) => {
   res.redirect(req.session.decoded_launch["https://purl.imsglobal.org/spec/lti/claim/launch_presentation"].return_url);
   req.session.destroy();   //TODO:  Make sure sessions are being destroyed in MongoDB
 });
-
 
 /*
 * The Routes below are for DEMO purposes
