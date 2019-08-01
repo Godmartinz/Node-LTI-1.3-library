@@ -29,6 +29,7 @@ function is_valid_oidc_login(req) {
 * @returns if valid request, returns properly formated response object
 * @return if invalid request, returns array of errors with the request
 */
+
 function create_oidc_response(req, res) {
   let errors = [];
 
