@@ -70,7 +70,7 @@ registerPlatform(
 registerPlatform(
   'https://demo.moodle.net',
   'Moodles demo',
-  'uM6yYI2cXQkVNl0',
+  'fX2QLnaAx5Llofg',
   'https://demo.moodle.net/mod/lti/auth.php',
   'https://demo.moodle.net/mod/lti/token.php', 
   { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
@@ -140,13 +140,13 @@ app.post(`/project/grading`, (req, res) => {
   .then(grading => {
     if (!grading.error) {
       req.session.grade = grading.grade;
-      // const redir = prep_send_score(req);
-      // res.redirect(307, redir);
+      const redir = prep_send_score(req);
+      res.redirect(307, redir);
     }
-    res.render("submit", {
-      payload: req.session.payload, 
-      formData: grading
-    });
+    // res.render("submit", {
+    //   payload: req.session.payload, 
+    //   formData: grading
+    // });
   });
 });
 

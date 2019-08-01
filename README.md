@@ -4,9 +4,9 @@
 
 This Javascript-based Library allows an education provider to integrate web-based external Tools into their chosen learning Platform, such as Moodle, Blackboard, Edgenuity, etc, without needing to understand the underlying Learning Tools Interoperability (LTI) standards (https://www.imsglobal.org/activity/learning-tools-interoperability). 
 
-This Library supports the LTI 1.3 Core standards (https://www.imsglobal.org/spec/lti/v1p3), which implements up-to-date privacy and security standards.  It also provides limited support the Assignment and Grade Services (https://www.imsglobal.org/spec/lti-ags/v2p0).
+This Library supports the LTI 1.3 Core standards, which implements up-to-date privacy and security standards.  It also provides limited support the Assignment and Grade Services.
 
-In the future, this Library will be updated to fully support the LTI Advantage extensions (https://www.imsglobal.org/spec/lti/v1p3/impl) for Assignments/Grades.  At this time, LTI Advantage Names and Roles Provisioning Services (https://www.imsglobal.org/spec/lti-nrps/v2p0/) and Deep Linking (https://www.imsglobal.org/spec/lti-dl/v2p0/) is not supported.
+In the future, this Library will be updated to fully support the LTI Advantage extensions for Assignments/Grades.  At this time, LTI Advantage Names and Roles Provisioning Services and Deep Linking is not supported.
 
 ## Overview
 
@@ -22,8 +22,8 @@ Follow these steps to implement this Library:
 
 Optionally, you can:
 
-A. View the OIDC Tool Launch Flow
-B. Use Example Tool
+A. Use Example Tool (see the related Example Tool repo for this)
+B. View the OIDC Tool Launch Flow (see the related Example Tool repo for this)
 C. Use the Test Suite
 D. View the Glossary
 
@@ -41,7 +41,9 @@ npm install node-lti-v1p3
 
 ### 2. Setup Server and Routes
 
-This library requires the use of an Express server.  Setup a basic Express server, add middleware, and routes within your server.js file to launch your Tool.  You can refer to the server.js example file in our Example Tool.
+This library requires the use of an Express server.  Setup a basic Express server add middleware, and routes within your server.js file to launch your Tool.  You can refer to the server.js example file in our Example Tool.
+
+In addition, add the following to your server:
 
 *Middleware to store session information*
 ```
@@ -131,7 +133,7 @@ Within the Platform, the Site Administrator needs to setup the External Tool.  F
 - Tool's Base URL <Tool Base URL>
 - Tool's Description, if desired
 - Mark the tool as a 'LTI1.3' Tool
-- Tool's Public Key -- you will need to come back and add this in a moment, see below about generating a Public/Private key pair
+- Tool's Public Key -- you will need to come back and add this in a moment, see below about obtaining your Public key
 - Initiate Login URL - < Tool Base URL > + '/oidc'
 - Redirection URIs - all of the endpoints that may be used, for example < Tool Base URL >/project/submit
 - Enable Assignment and Grade Services, if Tool should send grades to Platform
@@ -182,132 +184,7 @@ Now that your server is running, you are able to access the Tool's generated Cli
 
 ### 7. Optional Activities
 
-#### A. View the OIDC Tool Launch Flow
-
-The Example Tool contains an illustration of the Authorization flow which occurs within the Library when you drop a Tool into a Platform.  In order to run the example, start the MongoDB and your Express server by running in separate terminals:
-
-```
-mongod
-npm start
-```
-
-The Example Tool will run on `http://localhost:3000/` in your browser.  The example walks through what occurs behind-the-scenes during an LTI1.3 Tool launch.  It is important to understand that the Platform users (students, teachers) do not see any of this flow, this all occurs behind the scenes.  Also, the Tool on this page is a mockup and not fully functional, see the next section for how you can implement the functional Example Tool in a running Platform.
-
-##### View Behind the Scenes Launch Flow
-
-> 1. Clicking the 'Initiate Tool from LMS' button will generate a properly formatted OIDC Login Request that a Platform would create:
-> ```java
-> { iss: 'https://demo.moodle.net',
->   target_link_uri: 'https://piedpiper.localtunnel.me',
->   login_hint: '9',
->   lti_message_hint: '377' }
-> ```
-> 2. The Library validates the request and constructs a properly formatted OIDC Login Response.  This response is sent to  the Platform's OIDC Authorization endpoint that was received during Registration.  
-> 
-> ```java
-> { 'scope': 'openid', 
->   'response_type': 'id_token', 
->   'client_id': 'SDF7ASDLSFDS9', 
->   'redirect_uri': 'https://piedpiper.localtunnel.me', 
->   'login_hint': '9', 
->   'state': 'vSSRdELr5noUNazBuYmlpYywYBeDlF', 
->   'response_mode': 'form_post', 
->   'nonce': 'oNa1yWsS8erQA2iYqYzEi4pbP', 
->   'prompt': 'none', 
->   'lti_message_hint': '377' }
-> ```
->
-> 3. The Platform will validate the login response and initiate the Tool launch by sending a JWT, which the Library decodes to an object like:
-> 
-> ```java
-> { nonce: 'oNa1yWsS8erQA2iYqYzEi4pbP',
->   iat: 1564506231,
->   exp: 1564506291,
->   iss: 'https://demo.moodle.net',
->   aud: 'uuYLGWBmhhuZvBf',
->   'https://purl.imsglobal.org/spec/lti/claim/deployment_id': '2',
->   'https://purl.imsglobal.org/spec/lti/claim/target_link_uri': 'https://piedpiper.localtunnel.me/',
->   sub: '9',
->   'https://purl.imsglobal.org/spec/lti/claim/roles':
->    [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner' ],
->   'https://purl.imsglobal.org/spec/lti/claim/context':
->    { id: '47',
->      label: 'AGILE200',
->      title: 'Internship',
->      type: [ 'CourseSection' ] },
->   'https://purl.imsglobal.org/spec/lti/claim/resource_link': { title: 'Test LTI for Team Pied Piper', id: '4' },
->   given_name: 'John',
->   family_name: 'Smith',
->   name: 'John Smith',
->   'https://purl.imsglobal.org/spec/lti/claim/ext':
->    { user_username: 'john.smith@gmail.com', lms: 'moodle-2' },
->   email: 'john.smith@gmail.com',
->   'https://purl.imsglobal.org/spec/lti/claim/launch_presentation':
->    { locale: 'en',
->      document_target: 'window',
->      return_url:
->       'https://demo.moodle.net/mod/lti/return.php?course=47&launch_container=4&instanceid=4&sesskey=xcsU4krTwV' },
->   'https://purl.imsglobal.org/spec/lti/claim/tool_platform':
->    { family_code: 'moodle',
->      version: '2019052000.01',
->      guid: 'demo.moodle.net',
->      name: 'Moodle Demo',
->      description: 'Moodle Demo Sandbox' },
->   'https://purl.imsglobal.org/spec/lti/claim/version': '1.3.0',
->   'https://purl.imsglobal.org/spec/lti/claim/message_type': 'LtiResourceLinkRequest',
->   'https://purl.imsglobal.org/spec/lti-ags/claim/endpoint':
->    { scope:
->       [ 'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly',
->         'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly',
->         'https://purl.imsglobal.org/spec/lti-ags/scope/score' ],
->      lineitems:
->       'https://demo.moodle.net/mod/lti/services.php/47/lineitems?type_id=2',
->      lineitem:
->       'https://demo.moodle.net/mod/lti/services.php/47/lineitems/109/lineitem?type_id=2' },
->   'https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice':
->    { context_memberships_url:
->       'https://demo.moodle.net/mod/lti/services.php/CourseSection/47/bindings/2/memberships',
->      service_versions: [ '1.0', '2.0' ] } }
-> ```
-> 
-> 4. If a valid request was sent, it will redirect the student to the Tool.  Note:  The Tool is **not** operational in this demo.
-
-##### Generate Access Token
-
-> Clicking the 'Get Token' button will display a JSON Web Token that the Library is able to create:
-> 
-> ```java
-> {
->   sub: < your Tool's Client ID >,
->   expires_in: 3600,             // 1 hour per LTI1.3 spec
->   token_type: 'bearer',
->   scope: < valid scope being requested >
-> }
-> ```
-> If successful, the example will display the token authorizing the Tool to have access to the Platform's API.  This token is secured as a JWT, so the Platform will be able to verify the JWT on their side with the public key.
-> 
-> If you want to view the JSON object that is being passed through the JWT, copy the token and paste it into the 'JWT String box' on https://www.jsonwebtoken.io/.  This will enable you to view the JSON object on the Payload.
-
-##### B. Use Example Tool
-
-> Now that you understand the flow of messages, the Example Tool can be dropped into a Platform so that you can experience the Library's usage in a live environment.  For instance, you can use the setup instructions above to Register the Tool with the Platform and vice/versa within Moodle's sandbox.  
-> 
-> The Example Tool is a Project Submission Grader.  When the Tool is launched, the student will see a form where they can enter a Github URL and a Heroku and/or Now URL.  After the student enters the URLs of their project and clicks Submit, the Tool will grade the project. 
-> 
->   In order to Submit a project, URLs should be formatted similar to:
->     
->     http://www.github.com/
->               OR
->     http://www.herokuapp.com  or  http://www.now.sh
-> 
-> If the URLs are not properly formatted and/or the GitHub URL doesn't launch successfully, the student will see an error message.  With a valid project, when the student clicks Submit, s/he will be shown the resulting grade and the Tool uses the Library to pass the grade back to the Platform.
-> 
-> Finally, when the student clicks Done, the student is returned to the Platform.  The Teacher or Administrator on the Platform should be able to see that a grade has been used for test student for the Example Tool.
-
-
----
-
-#### C. Test Suite
+#### Test Suite
 
 The Library provides a test suite to verify portions of the basic functionality.  
 
@@ -330,11 +207,18 @@ npm test
 
 ---
 
-#### D. Glossary
+#### Glossary
 
 JWT - JSON Web Tokens (JWTs) are an open, industry standard that supports securely transmitting information between parties as a JSON object.  Signed tokens can verify the integrity of the claims contained within it.  (https://openid.net/specs/draft-jones-json-web-token-07.html).  
 
-LTI - The IMS Learning Tools Interoperability specification allows Platforms to integrate external Tools and content in a standard way. LTI v1.3 and the LTI Advantage set of services incorporate a new model for secure message and service authentication with OAuth 2.0. (https://www.imsglobal.org/activity/learning-tools-interoperability)
+LTI 1.3 - The IMS Learning Tools Interoperability specification ((https://www.imsglobal.org/spec/lti/v1p3)) allows Platforms to integrate external Tools and content in a standard way. As of 2019, LTI v1p3 is the latest standard.
+
+LTI Advantage - Services (https://www.imsglobal.org/spec/lti/v1p3/impl) built on top of LTI 1.3 for:
+* Assignment and Grades Services - (https://www.imsglobal.org/spec/lti-ags/v2p0)
+* Names and Roles Provisioning Services (https://www.imsglobal.org/spec/lti-nrps/v2p0/)
+* Deep Linking Services (https://www.imsglobal.org/spec/lti-dl/v2p0/)
+
+LTI v1.3 and the LTI Advantage - together this set of services incorporate a new model for secure message and service authentication with OAuth 2.0. (https://www.imsglobal.org/activity/learning-tools-interoperability)
 
 LMS - Learning Management System.  Referred to as Platforms in this document.
 
