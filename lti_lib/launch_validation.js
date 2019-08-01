@@ -234,7 +234,7 @@ function valid_launch_request(body, req) {
 * @returns object with errors if invalid launch, otherwise, redirects to Tool
 */
 function launchTool(req, res, path) {
-
+  
   let errors = [];
   if (req.body.hasOwnProperty('error')) {
     errors = [`Login Response was rejected: ${req.body.error}`];
@@ -262,7 +262,7 @@ function launchTool(req, res, path) {
   }
   if (errors.length > 0) {
     return res.status(400).send({
-      error: "invalid_request",
+      error: "invalid_requestx",
       errors: errors
     });
   }

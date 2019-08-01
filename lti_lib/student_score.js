@@ -1,20 +1,22 @@
 const axios = require('axios');
+const {tokenRequest}= require('../lti_lib/token_generator');
 
-function send_score(grade, payload) {
-  if (payload.hasOwnProperty('https://purl.imsglobal.org/spec/lti-ags/claim/endpoint') &&
-    payload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"].scope.includes('https://purl.imsglobal.org/spec/lti-ags/scope/score')) {
+function send_score(grade, req) {
+  tokenRequest(req);
+
+  if (req.session.payload.hasOwnProperty('https://purl.imsglobal.org/spec/lti-ags/claim/endpoint') &&
+    req.session.payload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"].scope.includes('https://purl.imsglobal.org/spec/lti-ags/scope/score')) {
   
     var headers = {
       'Content-Type': 'application/vnd.ims.lis.v1.score+json',
     }
-    axios.post(payload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"].lineitem + "/scores", {
-        "userId":  payload.sub,
+    axios.post(req.session.payload["https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"].lineitem + "/scores", {
+        "userId":  req.session.payload.sub,
         "scoreGiven": grade,
         "scoreMaximum": 1,
         "timestamp": new Date(Date.now()).toJSON(),
         "activityProgress": "Completed",
-        "gradingProgress": "FullyGraded"
-
+        "gradingProgress": "FullyGraded" 
     }, { headers: headers })
     .catch((error) => {
         console.error(error)

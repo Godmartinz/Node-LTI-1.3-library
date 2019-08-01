@@ -33,12 +33,13 @@ app.use( (req,res,next) => {
 app.set("views", "./views");
 app.set("view engine", "ejs");
 
-mongoose.connect(process.env.MONGODB_URI, {
+mongoose.connect(/*process.env.MONGODB_URI*/'mongodb://localhost:27017/TESTLTI', {
   useNewUrlParser: true, 
-  auth: {
-    user: process.env.MONGO_USER,
-    password: process.env.MONGO_PASSWORD
-  }},
+  // auth: {
+  //   user: process.env.MONGO_USER,
+  //   password: process.env.MONGO_PASSWORD
+  // }
+},
   (err) => {
     if(err) {
       return console.log(err);
@@ -59,7 +60,7 @@ registerPlatform(
 registerPlatform(
   'https://demo.moodle.net',
   'Moodles demo',
-  'CcuL9btxIKvnHKo',
+  'cJOTWmzx27UqbSk',
   'https://demo.moodle.net/mod/lti/auth.php',
   'https://demo.moodle.net/mod/lti/token.php', 
   { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
@@ -129,6 +130,7 @@ app.post("/project/submit", (req, res) => {
   if (is_valid_oidc_launch(req)) {
     //Save OIDC Launch Request for later reference during current session
     req.session.payload = req.body;
+    console.log(req.session.payload);
     launchTool(req, res, '/project/submit');
   } else {
     res.send('invalid request');
@@ -145,10 +147,12 @@ app.get("/project/submit", (req, res) => {
 
 app.post(`/project/grading`, (req, res) => {
   //Grade the project and if there aren't errors with the grading, send the score.  Re-render Grading page.
+  // console.log("we in here")
+  
   grade_project(req)
     .then(grading => {
       if (!grading.error) {
-        send_score(grading.grade, req.session.decoded_launch)
+        send_score(grading.grade, req)
       }
       res.render("submit", {
         payload: req.session.payload, 
