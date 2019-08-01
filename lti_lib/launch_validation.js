@@ -1,4 +1,3 @@
-// const Joi = require("@hapi/joi");
 const jwt = require('jsonwebtoken');
 const jwkToPem = require('jwk-to-pem');
 const axios = require('axios');
@@ -226,6 +225,19 @@ function valid_launch_request(body, req) {
 }
 
 /*
+* Validate that the state sent with an OIDC launch matches the state that was sent in the OIDC response
+* @param req - HTTP OIDC request to launch Tool.
+* @returns - boolean on whether it is valid or not
+*/
+function is_valid_oidc_launch(req) {
+  //TODO: when state is signed before being sent, need to decode before validation
+  if (req.body.state !== req.session.login_response.state) {
+    return false;
+  }
+  return true;
+}
+
+/*
 * Validates that the required keys are present and filled per LTI 1.3 standards in conjunction with the OAuth_validation
 * before launching Tool.
 * @param req Request 
@@ -234,31 +246,44 @@ function valid_launch_request(body, req) {
 * @returns object with errors if invalid launch, otherwise, redirects to Tool
 */
 function launchTool(req, res, path) {
-
   let errors = [];
+
+  //If Platform rejected login response, show error
   if (req.body.hasOwnProperty('error')) {
-    errors = [`Login Response was rejected: ${req.body.error}`];
+    errors.push(`Login Response was rejected: ${req.body.error}`);
   } else {
-    const jwt_string = req.body.id_token; 
-    let basic_decoded = jwt.decode(jwt_string, {complete: true});
-   
-    axios.get(req.session.platform_DBinfo.consumerAuthorizationconfig.key + '?kid=' + basic_decoded.header.kid)
-    .then(keys => {
-      jwt.verify(jwt_string, jwkToPem(keys.data.keys[0]), {algorithm: 'RS256'}, (err, decoded) => {
-        if (err) {
-          errors = [`Could not verify token: ${err}`];
-        } else {
-          //Save decoded OIDC Launch Request to reference later during the current session
-          req.session.decoded_launch = decoded;
-          
-          errors = valid_launch_request(decoded, req);
-          if (errors.length === 0) {
-            //No errors, so redirect to the Tool
-            return res.send({ payload: req.session.payload } && res.redirect(decoded['https://purl.imsglobal.org/spec/lti/claim/target_link_uri'] + path));
+    //Validate OIDC Launch Request
+    if (!is_valid_oidc_launch(req)) {
+      errors.push('Invalid OIDC Launch Request: state mismatch'); 
+    } else {
+      //If valid, save OIDC Launch Request for later reference during current session
+      req.session.payload = req.body;
+  
+      //Decode the JWT into header, payload, and signature
+      const jwt_string = req.body.id_token; 
+      let basic_decoded = jwt.decode(jwt_string, {complete: true});
+
+      //Get the key to verify the JWT
+      axios.get(req.session.platform_DBinfo.consumerAuthorizationconfig.key + '?kid=' + basic_decoded.header.kid)
+      .then(keys => {
+        jwt.verify(jwt_string, jwkToPem(keys.data.keys[0]), {algorithm: 'RS256'}, (err, decoded) => {
+          if (err) {
+            errors.push(`Could not verify token: ${err}`);
+          } else {
+            //Save decoded OIDC Launch Request to reference later during the current session
+            req.session.decoded_launch = decoded;
+
+            //Validate Launch Request details
+            errors = valid_launch_request(decoded, req);
+
+            if (errors.length === 0) {
+              //No errors, so redirect to the Tool
+              return res.send({ payload: req.session.payload } && res.redirect(decoded['https://purl.imsglobal.org/spec/lti/claim/target_link_uri'] + path));
+            }
           }
-        }
+        });
       });
-    });
+    }
   }
   if (errors.length > 0) {
     return res.status(400).send({
