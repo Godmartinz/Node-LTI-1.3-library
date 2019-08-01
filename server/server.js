@@ -42,7 +42,6 @@ app.set("view engine", "ejs");
 
 /** Setup MongoDB to store Platform data
 */
-
 mongoose.connect(process.env.MONGODB_URI/*'mongodb://localhost:27017/TESTLTI'*/, {
   useNewUrlParser: true, 
   auth: {
@@ -149,13 +148,13 @@ app.post(`/project/grading`, (req, res) => {
   .then(grading => {
     if (!grading.error) {
       req.session.grade = grading.grade;
-      const redir = prep_send_score(req);
-      res.redirect(307, redir);
+      // const redir = prep_send_score(req);
+      // res.redirect(307, redir);
     }
-    // res.render("submit", {
-    //   payload: req.session.payload, 
-    //   formData: grading
-    // });
+    res.render("submit", {
+      payload: req.session.payload, 
+      formData: grading
+    });
   });
 });
 
