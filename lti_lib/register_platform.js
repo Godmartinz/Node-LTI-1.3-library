@@ -17,6 +17,11 @@ const platformSchema = new Schema({
   }
 });
 
+/*
+* Register a new Platform for the Tool
+* @params - all of the Platform/Tool fields shown below
+* @returns Platform object, if Platform is already registered
+*/
 const registerPlatform = async (
   consumerUrl, /* Base url of the LMS. */
   consumerName, /* Domain name of the LMS. */
@@ -30,7 +35,7 @@ const registerPlatform = async (
     console.log('Error: registerPlatform function is missing argument.');
   };
   let existingPlatform = await Database.Get('platforms', platformSchema, { consumerUrl: consumerUrl });
-
+ 
   //checks database for existing platform.
   if (existingPlatform.length === 1) {
     return existingPlatform;

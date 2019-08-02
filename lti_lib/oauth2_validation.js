@@ -1,4 +1,3 @@
-require('dotenv').config();
 
 /* 
  * Validate LTI 1.3 OAuth2 Client Credentials Request
@@ -28,7 +27,6 @@ function valid_oauth2_request(req) {
     }
 
     // Check the client_id
-    // TODO:  We should have a database of valid client_ids
     if (!body.hasOwnProperty('client_id')) {
       errors.push('client id missing')
     } else {
@@ -38,7 +36,6 @@ function valid_oauth2_request(req) {
     }
 
     // Check the client_secret
-    // TODO:  We need to connect client_id with their secret
     if (!body.hasOwnProperty('client_secret')) {
       errors.push('client secret missing')
     } else {
