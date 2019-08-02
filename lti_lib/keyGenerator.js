@@ -23,6 +23,7 @@ function passPhrase() {
 */
 function keyGenerator() {
   var keys = {};
+  var kid = passPhrase();
 
   const { publicKey, privateKey } = generateKeyPairSync(
     "rsa",
@@ -36,7 +37,7 @@ function keyGenerator() {
         type: "pkcs8",
         format: "pem",
         cipher: "aes-256-cbc",
-        passphrase: passPhrase()
+        passphrase: kid
       }
     },
     (err, publicKey, privateKey) => {
@@ -52,7 +53,7 @@ function keyGenerator() {
     }
   );
 
-  keys = { 'publicKey': publicKey , 'privateKey': privateKey };
+  keys = { 'publicKey': publicKey , 'privateKey': privateKey, keyID: kid };
   return keys;
 }
 
