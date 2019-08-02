@@ -1,4 +1,3 @@
-require('dotenv').config();
 const url = require('url');    
 const Database = require('../lti_lib/mongoDB/Database.js');
 const { platformSchema } = require('../lti_lib/register_platform');
@@ -52,7 +51,7 @@ function create_oidc_response(req, res) {
         scope: 'openid',
         response_type: 'id_token',
         client_id: req.session.platform_DBinfo.consumerToolClientID,
-        redirect_uri: process.env.REDIRECT_URI,     // TODO: store in DB per Issuer (Consumer)?
+        redirect_uri: req.session.platform_DBinfo.consumerRedirect_URI,
         login_hint: req.body.login_hint,
         state: create_unique_string(30, true),
         response_mode: 'form_post',
@@ -98,4 +97,4 @@ function create_unique_string(length, signed) {
   return unique_string;
 }
 
-module.exports = { create_oidc_response };
+module.exports = { create_oidc_response, create_unique_string };

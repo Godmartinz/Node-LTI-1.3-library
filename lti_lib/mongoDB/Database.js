@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
 
+/*
+* Database class to maintain and access Platform information
+*/
 class Database {
 
   static async Get(collection, platformSchema, query) {
