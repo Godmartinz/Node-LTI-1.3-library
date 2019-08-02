@@ -1,4 +1,3 @@
-require('dotenv').config();
 
 /* 
  * Validate LTI 1.3 OAuth2 Client Credentials Request

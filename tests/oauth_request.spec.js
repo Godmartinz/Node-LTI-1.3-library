@@ -2,7 +2,6 @@ const expect = require('chai').expect;
 const axios = require('axios');
 const qs = require('qs');
 const app = require('../server/server.js');
-require('dotenv').config();
 
 describe('OAuth2.0 flow', function() {
   let httpServer = null;

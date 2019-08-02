@@ -56,15 +56,15 @@ mongoose.connect(process.env.MONGODB_URI/*'mongodb://localhost:27017/TESTLTI'*/,
 });
 mongoose.Promise = Promise;
   
-// registerPlatform(
-//   'https://www.sandiegocode.school',
-//   'SanDiegocode.school',
-//   'uuYLGWBmhhuZvBf',
-//   'https://www.sandiegocode.school/mod/lti/auth.php',
-//   'https://www.sandiegocode.school/mod/lti/token.php',
-//   'https://www.sandiegocode.school/project/submit',
-//   { method: 'JWK_SET', key: 'https://www.sandiegocode.school/mod/lti/certs.php' }
-// );
+registerPlatform(
+  'https://www.sandiegocode.school',
+  'SanDiegocode.school',
+  'uuYLGWBmhhuZvBf',
+  'https://www.sandiegocode.school/mod/lti/auth.php',
+  'https://www.sandiegocode.school/mod/lti/token.php',
+  'https://www.sandiegocode.school/project/submit',
+  { method: 'JWK_SET', key: 'https://www.sandiegocode.school/mod/lti/certs.php' }
+);
 
 registerPlatform(
   'https://demo.moodle.net',
@@ -89,14 +89,6 @@ app.use(session({
   httpOnly: true,
   store: new MongoStore({ mongooseConnection: mongoose.connection })
 }));
-
-app.get("/", (req, res) => {
-  res.render("index");
-});
-
-app.post("/", (req, res) => {
-  console.log(req.body);
-});
 
 
 /*
