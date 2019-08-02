@@ -105,6 +105,7 @@ This library requires MongoDB.  If you do not currently have MongoDB setup, foll
 
 * MacOS - use homebrew: https://docs.mongodb.com/master/tutorial/install-mongodb-on-os-x/
 * Windows - use the installer from here: https://docs.mongodb.com/master/tutorial/install-mongodb-on-windows/
+* Linux - choose your flavor to install here: https://docs.mongodb.com/master/administration/install-on-linux/
 
 Add the following to your server.js file:
 ```
