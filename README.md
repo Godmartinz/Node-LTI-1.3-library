@@ -12,7 +12,7 @@ In the future, this Library will be updated to fully support the LTI Advantage e
 
 Follow these steps to implement this Library:
 
-0. Develop a Tool
+0. [Develop a Tool][#develop-a-tool]
 1. Install Library
 2. Setup Server and Routes
 3. Setup MongoDB
