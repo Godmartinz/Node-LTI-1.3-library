@@ -57,31 +57,31 @@ mongoose.connect(process.env.MONGODB_URI/*'mongodb://localhost:27017/TESTLTI'*/,
 });
 mongoose.Promise = Promise;
   
-registerPlatform(
-  'https://www.sandiegocode.school',
-  'SanDiegocode.school',
-  'uuYLGWBmhhuZvBf',
-  'https://www.sandiegocode.school/mod/lti/auth.php',
-  'https://www.sandiegocode.school/mod/lti/token.php',
-  'https://www.sandiegocode.school/project/submit',
-  { method: 'JWK_SET', key: 'https://www.sandiegocode.school/mod/lti/certs.php' }
-);
-
 // registerPlatform(
-//   'https://demo.moodle.net',
-//   'Moodles demo',
-//   'CyKAucwWddL1wtH',
-//   'https://demo.moodle.net/mod/lti/auth.php',
-//   'https://demo.moodle.net/mod/lti/token.php',
-//   'https://node-lti-v1p3.herokuapp.com/project/submit',
-//   { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
+//   'https://www.sandiegocode.school',
+//   'SanDiegocode.school',
+//   'uuYLGWBmhhuZvBf',
+//   'https://www.sandiegocode.school/mod/lti/auth.php',
+//   'https://www.sandiegocode.school/mod/lti/token.php',
+//   'https://www.sandiegocode.school/project/submit',
+//   { method: 'JWK_SET', key: 'https://www.sandiegocode.school/mod/lti/certs.php' }
 // );
+
+registerPlatform(
+  'https://demo.moodle.net',
+  'Moodles demo',
+  '8tDENy4kyX9N59M',
+  'https://demo.moodle.net/mod/lti/auth.php',
+  'https://demo.moodle.net/mod/lti/token.php',
+  'https://node-lti-v1p3.herokuapp.com/project/submit',
+  { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
+);
 
 app.get('/publickey', async (req, res) => {
   let publicKey = await Database.GetKey(
     'platforms',
     platformSchema,
-    { consumerUrl: 'https://www.sandiegocode.school' } // base URL used when registering your platform.
+    { consumerUrl: 'https://demo.moodle.net' } // base URL used when registering your platform.
   );
 
     res.render('publicKey', {key: publicKey});
