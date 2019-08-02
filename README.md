@@ -12,7 +12,7 @@ In the future, this Library will be updated to fully support the LTI Advantage e
 
 Follow these steps to implement this Library:
 
-0. Develop a Tool
+0. [Develop a Tool][#-develop-a-tool]
 1. Install Library
 2. Setup Server and Routes
 3. Setup MongoDB
@@ -147,6 +147,7 @@ In order register a Platform with the Tool, add a call to `registerPlatform` in 
 registerPlatform(
   consumerUrl, // Base url of the Platform (1st line on screenshot - Platform ID from Moodle). 
   consumerName, // Base domain name of the Platform without any reserved characters, e.g., moodle
+
   consumerToolClientID, // Client ID generated upon configuration of an external tool on the platform. (2nd line on screenshot) 
   consumerAuthorizationURL, // URL that the Tool sends Authorization Requests/Responses to. (6th line on screen shot, Authentication request URL) 
   consumerAccessTokenURL, // URL that the Tool can use to obtain an access Tokens. (5th line on screen shot, Access Token URL) 
