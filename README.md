@@ -12,7 +12,7 @@ In the future, this Library will be updated to fully support the LTI Advantage e
 
 Follow these steps to implement this Library:
 
-0. [Develop a Tool](#-develop-a-tool)
+[0. Develop a Tool](###-0.-develop-a-tool)
 1. Install Library
 2. Setup Server and Routes
 3. Setup MongoDB
@@ -27,7 +27,7 @@ B. View the OIDC Tool Launch Flow (see the related Example Tool repo for this)
 C. Use the Test Suite
 D. View the Glossary
 
-### 0. # Develop a Tool
+### 0. Develop a Tool
 
 It is assumed if you are interested in integrating a Tool into a Platform that you have already developed a working Tool.  If not, Step 0 is to develop your Tool that will be dropped into a learning Platform.  If you are not at that point yet, you can use the Example Tool related to this Library.
 
