@@ -106,16 +106,10 @@ This library requires MongoDB.  If you do not currently have MongoDB setup, foll
 * MacOS - use homebrew: https://docs.mongodb.com/master/tutorial/install-mongodb-on-os-x/
 * Windows - use the installer from here: https://docs.mongodb.com/master/tutorial/install-mongodb-on-windows/
 
-Once you have MongoDB setup, make note of your MongoDB URI, username, and password. You will need to set these up as environment variables either in your production environment or in your development .env file.  
-
 Add the following to your server.js file:
 ```
-mongoose.connect(process.env.MONGODB_URI, {
+mongoose.connect('mongodb://localhost:27017/TESTLTI', {
   useNewUrlParser: true, 
-  auth: {
-    user: process.env.MONGO_USER,
-    password: process.env.MONGO_PASSWORD
-  }
 },
   (err) => {
     if(err) {
@@ -187,16 +181,6 @@ Now that your server is running, you are able to access the Tool's generated Cli
 #### Test Suite
 
 The Library provides a test suite to verify portions of the basic functionality.  
-
-The tests require the use of a .env file, which if you are new to Node, is a a simple configuration text file that is used to pass customized variables into your application’s environment. 
-
-You will need to load the test data in your .env file for the following:
-
-* MONGO_URI=< your MongoDB URI >
-* MONGO_USER=< your MongoDB username >
-* MONGO_PASSWORD=< your MongoDB password >
-
-Make sure that your .env file is listed in your .gitignore file.
 
 To launch the automated tests for this Library, run in separate terminals:
 
