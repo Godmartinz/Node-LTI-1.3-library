@@ -146,7 +146,7 @@ In order register a Platform with the Tool, add a call to `registerPlatform` in 
 ```
 registerPlatform(
   consumerUrl, // Base url of the Platform (1st line on screenshot - Platform ID from Moodle). 
-  consumerName, // Domain name of the Platform, e.g., Moodle's Demo
+  consumerName, // Base domain name of the Platform without any reserved characters, e.g., moodle
   consumerToolClientID, // Client ID generated upon configuration of an external tool on the platform. (2nd line on screenshot) 
   consumerAuthorizationURL, // URL that the Tool sends Authorization Requests/Responses to. (6th line on screen shot, Authentication request URL) 
   consumerAccessTokenURL, // URL that the Tool can use to obtain an access Tokens. (5th line on screen shot, Access Token URL) 
@@ -158,7 +158,7 @@ For example:
 ```
 registerPlatform(
   'https://demo.moodle.net',  
-  'Moodles demo',
+  'moodle',
   'BMe642xnf4ag3Pd',
   'https://demo.moodle.net/mod/lti/auth.php',
   'https://demo.moodle.net/mod/lti/token.php', 
@@ -176,7 +176,7 @@ mongod
 npm start
 ```
 
-Now that your server is running, you are able to access the Tool's generated Client Public key by making a GET request with `<your base URL>` as a parameter to `<your base URL>/publickey`.  This key must be put into the Tool's Public Key field in Step 4 above on the Platform.  
+Now that your server is running, you are able to access the Tool's generated Client Public key by making a GET request with `<your base URL>` as a parameter to `<your base URL>/publickey/< ConsumerName >`.  This key must be put into the Tool's Public Key field in Step 4 above on the Platform.  
 
 ---
 

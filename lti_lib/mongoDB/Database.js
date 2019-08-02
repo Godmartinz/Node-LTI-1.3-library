@@ -21,15 +21,14 @@ class Database {
 
   static async GetKey(collection, platformSchema, query) {
     let Model = mongoose.model(collection, platformSchema);
-    let publicKey = [];
+    let publicKey;
 
-    await Model.find(query, (err, key) => {
-      if (err) {
-        return console.log(`Error finding public key for: ${query.consumerURL}`);
-      } else {
-        publicKey = key[0].kid[0];
-      }
-    });
+    await Model.find(query)
+    .then(key => {
+      publicKey = key[0].kid.publicKey;
+    })
+    .catch(err => console.log(`Error finding platform ${err}`));
+
     return publicKey;
   }
 

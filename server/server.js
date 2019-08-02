@@ -68,13 +68,23 @@ registerPlatform(
 
 registerPlatform(
   'https://demo.moodle.net',
-  'Moodles demo',
-  'CyKAucwWddL1wtH',
+  'moodle',
+  '8tDENy4kyX9N59M',
   'https://demo.moodle.net/mod/lti/auth.php',
   'https://demo.moodle.net/mod/lti/token.php',
   'https://node-lti-v1p3.herokuapp.com/project/submit',
   { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
-); 
+);
+
+app.get('/publickey/:name', async (req, res) => {
+  let publicKey = await Database.GetKey(
+    'platforms',
+    platformSchema,
+    { consumerName: req.params.name }
+  );
+
+    res.json({key: publicKey});
+});
 
 /*
 * Setup Session to store data
