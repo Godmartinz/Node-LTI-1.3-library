@@ -6,7 +6,8 @@ const MongoStore = require('connect-mongo')(session);
 const mongoose = require('mongoose');
 
 //Required Library methods
-const { registerPlatform } = require('../lti_lib/register_platform');
+const Database = require('../lti_lib/mongoDB/Database');
+const { platformSchema, registerPlatform } = require('../lti_lib/register_platform');
 const { valid_oauth2_request } = require("../lti_lib/oauth2_validation");
 const { create_oidc_response, create_unique_string } = require("../lti_lib/oidc");
 const { launchTool } = require("../lti_lib/launch_validation");
@@ -68,13 +69,24 @@ registerPlatform(
 
 registerPlatform(
   'https://demo.moodle.net',
-  'Moodles demo',
-  'CyKAucwWddL1wtH',
+  'moodle',
+  '8tDENy4kyX9N59M',
+
   'https://demo.moodle.net/mod/lti/auth.php',
   'https://demo.moodle.net/mod/lti/token.php',
   'https://node-lti-v1p3.herokuapp.com/project/submit',
   { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
 );
+
+app.get('/publickey/:name', async (req, res) => {
+  let publicKey = await Database.GetKey(
+    'platforms',
+    platformSchema,
+    { consumerName: req.params.name }
+  );
+
+    res.json({key: publicKey});
+});
 
 /*
 * Setup Session to store data
@@ -89,7 +101,6 @@ app.use(session({
   httpOnly: true,
   store: new MongoStore({ mongooseConnection: mongoose.connection })
 }));
-
 
 /*
 * Routes below are for OAuth, OIDC, and Token usage
