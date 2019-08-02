@@ -44,10 +44,10 @@ app.set("view engine", "ejs");
 */
 mongoose.connect(process.env.MONGODB_URI/*'mongodb://localhost:27017/TESTLTI'*/, {
   useNewUrlParser: true, 
-  auth: {
+  /*auth: {
     user: process.env.MONGO_USER,
     password: process.env.MONGO_PASSWORD
-  }
+  }*/
 },
   (err) => {
     if(err) {
@@ -74,7 +74,7 @@ registerPlatform(
   'https://demo.moodle.net/mod/lti/token.php',
   'https://node-lti-v1p3.herokuapp.com/project/submit',
   { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
-);
+); 
 
 /*
 * Setup Session to store data
