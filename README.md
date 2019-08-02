@@ -85,7 +85,7 @@ app.post('/auth_code', (req, res) => {
 ```
 
 *Within your Tool's route where grading is performed, set up the score to be returned to the Platform.*
-This initiates the score submittal, which will end at the above /auth_code route where the score is finally sent
+This initiates the score submission, which will end at the above /auth_code route where the score is finally sent
 ```
   req.session.grade = < student's grade >;
   res.redirect(307, prep_send_score(req));
@@ -136,18 +136,22 @@ Within the Platform, the Site Administrator needs to setup the External Tool.  F
 
 After saving the External Tool, the Platform will assign a Client ID to the Tool and provide endpoints.  Make note of all of this information as it will be used in Step 5.  
 
+The next step will be to add the Tool to course(s).  This can be done by an Administrator or a Teacher.  In Moodle, the steps are to navigate the appropriate course and use the Gear icon to `Turn editing on`.  You will then be able to `Add an Activty or Resource` for an `External Tool`.  Simply give it a name and select the Tool you added above from the drop down box for `Preconfigured tool`.  Click `Save and return to course`.
+
 ### 5. Register Platform with Tool
 
-In order register a Platform with the Tool, add a call to `registerPlatform` in your server file, with the values you received from Step 4.
+In order register a Platform with the Tool, add a call to `registerPlatform` in your server file, with the values you received from Step 4.  For reference, here is a screenshot from the Moodle sandbox showing these values:
+
+![Moodle Tool Config](./Moodle_Tool_Config.png "this screenshot from Moodle")
 ```
 registerPlatform(
-  consumerUrl, /* Base url of the Platform. */
-  consumerName, /* Domain name of the Platform. */
-  consumerToolClientID, /* Client ID of the Tool, created from the Platform. */
-  consumerAuthorizationURL, /* URL that the Tool sends OIDC Launch Responses to. */
-  consumerAccessTokenURL, /* URL that the Tool can use to obtain an access token/login. */
-  consumerRedirectURL /* URL where the Tool is launched from */
-  consumerAuthorizationconfig, /* Authentication method and key for verifying messages from the Platform. */
+  consumerUrl, // Base url of the Platform (1st line on screenshot - Platform ID from Moodle). 
+  consumerName, // Domain name of the Platform, e.g., Moodle's Demo
+  consumerToolClientID, // Client ID generated upon configuration of an external tool on the platform. (2nd line on screenshot) 
+  consumerAuthorizationURL, // URL that the Tool sends Authorization Requests/Responses to. (6th line on screen shot, Authentication request URL) 
+  consumerAccessTokenURL, // URL that the Tool can use to obtain an access Tokens. (5th line on screen shot, Access Token URL) 
+  consumerRedirectURL // Tool's base URL PLUS slash route where Example Tool is served from. e.g., locally: '<LOCALTUNNEL SUB DOMAIN>' // cloud: 'https://node-lti-v1p3.herokuapp.com/'  PLUS '/project/submit'
+  consumerAuthorizationconfig, // WILL always be an object with two properties: Authentication method and key for verifying messages from the Platform. (method will be "JWK_SET" and key will be on 4th line of screen shot, Public keyset URL) 
 );
 ```
 For example:
@@ -172,7 +176,7 @@ mongod
 npm start
 ```
 
-Now that your server is running, you are able to access the Tool's generated Client Public key by making a GET request to `<your base URL>/publickey` (TODO:  verify endpoint when implemented).  This key must be put into the Tool's Public Key field in Step 4 above on the Platform.  
+Now that your server is running, you are able to access the Tool's generated Client Public key by making a GET request with `<your base URL>` as a parameter to `<your base URL>/publickey`.  This key must be put into the Tool's Public Key field in Step 4 above on the Platform.  
 
 ---
 
