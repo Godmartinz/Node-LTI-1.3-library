@@ -8,11 +8,6 @@ const jwt = require('jsonwebtoken');
 * @returns result with JWT, if successful, or an object with errors listed
 */
 function tokenMaker(errors, res) {
-<<<<<<< HEAD
-=======
-  // let keys = Database.Get('platforms', platformSchema, {consumerUrl: })
-  
->>>>>>> Gd flow fix (#53)
   if (errors.length === 0) {
     // no errors
     res.setHeader("Content-Type", "application/json;charset=UTF-8");

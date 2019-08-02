@@ -1,7 +1,10 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 require('dotenv').config();
 >>>>>>> separates library functions from Tool and from Demo code (#48)
+=======
+>>>>>>> Adds send score framework and cleans up code and docs (#55)
 const url = require('url');    
 const Database = require('../lti_lib/mongoDB/Database.js');
 const { platformSchema } = require('../lti_lib/register_platform');
@@ -66,10 +69,14 @@ function create_oidc_response(req, res) {
         response_type: 'id_token',
         client_id: req.session.platform_DBinfo.consumerToolClientID,
 <<<<<<< HEAD
+<<<<<<< HEAD
         redirect_uri: req.session.platform_DBinfo.consumerRedirect_URI,
 =======
         redirect_uri: process.env.REDIRECT_URI,     // TODO: store in DB per Issuer (Consumer)?
 >>>>>>> separates library functions from Tool and from Demo code (#48)
+=======
+        redirect_uri: req.session.platform_DBinfo.consumerRedirect_URI,
+>>>>>>> Adds send score framework and cleans up code and docs (#55)
         login_hint: req.body.login_hint,
         state: create_unique_string(30, true),
         response_mode: 'form_post',
@@ -116,7 +123,11 @@ function create_unique_string(length, signed) {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 module.exports = { create_oidc_response, create_unique_string };
 =======
 module.exports = { create_oidc_response };
 >>>>>>> separates library functions from Tool and from Demo code (#48)
+=======
+module.exports = { create_oidc_response, create_unique_string };
+>>>>>>> Adds send score framework and cleans up code and docs (#55)

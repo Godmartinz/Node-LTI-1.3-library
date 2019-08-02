@@ -38,8 +38,13 @@ const registerPlatform = async (
   if ( !consumerUrl || !consumerName || !consumerToolClientID || !consumerAuthorizationURL || !consumerAccessTokenURL || !consumerRedirect_URI || !consumerAuthorizationconfig ) {
     console.log('Error: registerPlatform function is missing argument.');
   };
+<<<<<<< HEAD
   let existingPlatform;
 
+=======
+  let existingPlatform = await Database.Get('platforms', platformSchema, { consumerUrl: consumerUrl });
+ 
+>>>>>>> Adds send score framework and cleans up code and docs (#55)
   //checks database for existing platform.
 <<<<<<< HEAD
   await Database.Get('platforms', platformSchema,{ 'consumerUrl': consumerUrl })

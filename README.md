@@ -12,6 +12,7 @@ In the future, this Library will be updated to fully support the LTI Advantage e
 
 Follow these steps to implement this Library:
 
+<<<<<<< HEAD
 1. [Develop a Tool](#develop-a-tool)
 2. [Install Library](#install-library)
 3. [Setup Server and Routes](#setup-server-and-routes)
@@ -19,6 +20,15 @@ Follow these steps to implement this Library:
 5. [Add Tool to Platform](#add-tool-to-platform)
 6. [Register Platform with Tool](#register-platform-with-tool)
 7. [Run your Server](#run-your-server)
+=======
+0. Develop a Tool
+1. Install Library
+2. Setup Server and Routes
+3. Setup MongoDB
+4. Add Tool to Platform
+5. Register Platform with Tool
+6. Run your Server
+>>>>>>> Adds send score framework and cleans up code and docs (#55)
 
 Optionally, you can:
 
@@ -39,6 +49,7 @@ To install this Library, use the Node Package Manager (NPM) and run in your term
 npm install node-lti-v1p3
 ```
 
+<<<<<<< HEAD
 ### Setup Server and Routes
 
 <<<<<<< HEAD
@@ -63,6 +74,11 @@ mongoose.Promise = Promise;
 
 ### 3. Setup Server and Routes
 >>>>>>> separates library functions from Tool and from Demo code (#48)
+=======
+### 2. Setup Server and Routes
+
+This library requires the use of an Express server.  Setup a basic Express server add middleware, and routes within your server.js file to launch your Tool.  You can refer to the server.js example file in our Example Tool.
+>>>>>>> Adds send score framework and cleans up code and docs (#55)
 
 In addition, add the following to your server:
 
@@ -103,8 +119,11 @@ app.post('/auth_code', (req, res) => {
   } else {
     res.status(401).send('Access denied: ' + req.params.error);
   }
+<<<<<<< HEAD
 =======
 >>>>>>> separates library functions from Tool and from Demo code (#48)
+=======
+>>>>>>> Adds send score framework and cleans up code and docs (#55)
 });
 ```
 
@@ -112,11 +131,16 @@ app.post('/auth_code', (req, res) => {
 This initiates the score submission, which will end at the above /auth_code route where the score is finally sent
 ```
 <<<<<<< HEAD
+<<<<<<< HEAD
   req.session.grade = < student's grade >;
   res.redirect(307, prep_send_score(req));
 =======
   send_score(< student's score >, req.session.decoded_launch)
 >>>>>>> separates library functions from Tool and from Demo code (#48)
+=======
+  req.session.grade = < student's grade >;
+  res.redirect(307, prep_send_score(req));
+>>>>>>> Adds send score framework and cleans up code and docs (#55)
 ```
 
 *Route to return from Tool to Platform*
@@ -127,13 +151,20 @@ app.post('/project/return', (req, res) => {
 });
 ```
 
+<<<<<<< HEAD
 ### Setup MongoDB
+=======
+### 3. Setup MongoDB
+>>>>>>> Adds send score framework and cleans up code and docs (#55)
 
 This library requires MongoDB.  If you do not currently have MongoDB setup, follow these instructions.
 
 * MacOS - use homebrew: https://docs.mongodb.com/master/tutorial/install-mongodb-on-os-x/
 * Windows - use the installer from here: https://docs.mongodb.com/master/tutorial/install-mongodb-on-windows/
+<<<<<<< HEAD
 * Linux - choose your flavor to install here: https://docs.mongodb.com/master/administration/install-on-linux/
+=======
+>>>>>>> Adds send score framework and cleans up code and docs (#55)
 
 Add the following to your server.js file:
 ```
@@ -148,7 +179,11 @@ mongoose.connect('mongodb://localhost:27017/TESTLTI', {
 mongoose.Promise = Promise;
 ```
 
+<<<<<<< HEAD
 ### Add Tool to Platform
+=======
+### 4. Add Tool to Platform
+>>>>>>> Adds send score framework and cleans up code and docs (#55)
 
 Within the Platform, the Site Administrator needs to setup the External Tool.  For example, in Moodle s/he goes to Site Administration->Plugins->External Tool->Manage Tools.  At a minimum, the following fields should be setup:
 
@@ -164,11 +199,19 @@ Within the Platform, the Site Administrator needs to setup the External Tool.  F
 - Choose 'Always' Accept grades from the Tool, if Tool should send grades to Platform  
 
 After saving the External Tool, the Platform will assign a Client ID to the Tool and provide endpoints.  Make note of all of this information as it will be used in Step 5.  
+<<<<<<< HEAD
+=======
+
+The next step will be to add the Tool to course(s).  This can be done by an Administrator or a Teacher.  In Moodle, the steps are to navigate the appropriate course and use the Gear icon to `Turn editing on`.  You will then be able to `Add an Activty or Resource` for an `External Tool`.  Simply give it a name and select the Tool you added above from the drop down box for `Preconfigured tool`.  Click `Save and return to course`.
+>>>>>>> Adds send score framework and cleans up code and docs (#55)
 
 The next step will be to add the Tool to course(s).  This can be done by an Administrator or a Teacher.  In Moodle, the steps are to navigate the appropriate course and use the Gear icon to `Turn editing on`.  You will then be able to `Add an Activty or Resource` for an `External Tool`.  Simply give it a name and select the Tool you added above from the drop down box for `Preconfigured tool`.  Click `Save and return to course`.
 
+<<<<<<< HEAD
 ### Register Platform with Tool
 
+=======
+>>>>>>> Adds send score framework and cleans up code and docs (#55)
 In order register a Platform with the Tool, add a call to `registerPlatform` in your server file, with the values you received from Step 4.  For reference, here is a screenshot from the Moodle sandbox showing these values:
 
 ![Moodle Tool Config](./Moodle_Tool_Config.png "this screenshot from Moodle")
@@ -196,7 +239,11 @@ registerPlatform(
 );
 ```
 
+<<<<<<< HEAD
 ### Run your Server
+=======
+### 6. Run your Server
+>>>>>>> Adds send score framework and cleans up code and docs (#55)
 
 Once the Tool is integrated with the Platform, your server must be up and running so that the Tool can be accessed. In a development environment, start your MongoDB and your server in separate terminals:
 
@@ -209,7 +256,11 @@ Now that your server is running, you are able to access the Tool's generated Cli
 
 ---
 
+<<<<<<< HEAD
 ### Optional Activities
+=======
+### 7. Optional Activities
+>>>>>>> Adds send score framework and cleans up code and docs (#55)
 
 #### Test Suite
 

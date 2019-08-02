@@ -101,14 +101,6 @@ app.use(session({
   store: new MongoStore({ mongooseConnection: mongoose.connection })
 }));
 
-app.get("/", (req, res) => {
-  res.render("index");
-});
-
-app.post("/", (req, res) => {
-  console.log(req.body);
-});
-
 
 /*
 * Routes below are for OAuth, OIDC, and Token usage
