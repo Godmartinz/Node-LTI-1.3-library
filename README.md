@@ -27,7 +27,7 @@ B. View the OIDC Tool Launch Flow (see the related Example Tool repo for this)
 C. Use the Test Suite
 D. View the Glossary
 
-### 0. #Develop a Tool
+### 0. # Develop a Tool
 
 It is assumed if you are interested in integrating a Tool into a Platform that you have already developed a working Tool.  If not, Step 0 is to develop your Tool that will be dropped into a learning Platform.  If you are not at that point yet, you can use the Example Tool related to this Library.
 
