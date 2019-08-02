@@ -16,6 +16,7 @@ class Database {
       .catch(err => console.log(`Error finding platform ${err}`));
 
       return platformData;
+
   };
 
   static async GetKey(collection, platformSchema, query) {

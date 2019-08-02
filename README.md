@@ -178,6 +178,7 @@ npm start
 
 Now that your server is running, you are able to access the Tool's generated Client Public key by making a GET request with to `<your base URL>/publickey/< ConsumerName >`.  This key must be put into the Tool's Public Key field in Step 4 above on the Platform.  
 
+
 ---
 
 ### 7. Optional Activities

@@ -71,6 +71,7 @@ registerPlatform(
   'https://demo.moodle.net',
   'moodle',
   '8tDENy4kyX9N59M',
+
   'https://demo.moodle.net/mod/lti/auth.php',
   'https://demo.moodle.net/mod/lti/token.php',
   'https://node-lti-v1p3.herokuapp.com/project/submit',

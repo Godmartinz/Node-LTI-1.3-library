@@ -35,7 +35,7 @@ const registerPlatform = async (
     console.log('Error: registerPlatform function is missing argument.');
   };
   let existingPlatform;
-  
+
   //checks database for existing platform.
   await Database.Get('platforms', platformSchema,{ 'consumerUrl': consumerUrl })
   .then( (registeringPlatform) => {
