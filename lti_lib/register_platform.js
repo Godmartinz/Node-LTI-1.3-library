@@ -10,7 +10,7 @@ const platformSchema = new Schema({
   consumerAuthorizationURL: String,
   consumerAccessTokenURL: String,
   consumerRedirect_URI: String,
-  kid: Array,
+  kid: Object,
   consumerAuthorizationconfig: {
     method: String,
     key: String
@@ -34,27 +34,34 @@ const registerPlatform = async (
   if ( !consumerUrl || !consumerName || !consumerToolClientID || !consumerAuthorizationURL || !consumerAccessTokenURL || !consumerRedirect_URI || !consumerAuthorizationconfig ) {
     console.log('Error: registerPlatform function is missing argument.');
   };
-  let existingPlatform = await Database.Get('platforms', platformSchema, { consumerUrl: consumerUrl });
- 
+  let existingPlatform;
+  
   //checks database for existing platform.
-  if (existingPlatform.length === 1) {
-    return existingPlatform;
-  } else {
-    const keyPairs = keyGenerator();
-
-    // .Insert() method accepts ('platforms', platformSchema, objectToInsert { consumerUrl: consumerUrl, ...})
-    Database.Insert('platforms', platformSchema, { 
-      'consumerUrl': consumerUrl,
-      'consumerName': consumerName,
-      'consumerToolClientID': consumerToolClientID,
-      'consumerAuthorizationURL': consumerAuthorizationURL,
-      'consumerAccessTokenURL': consumerAccessTokenURL,
-      'consumerRedirect_URI': consumerRedirect_URI,
-      'kid': keyPairs,
-      'consumerAuthorizationconfig': consumerAuthorizationconfig,
-    });
-    return console.log(`Platform registered at: ${consumerUrl}`);
-  };
+  await Database.Get('platforms', platformSchema,{ 'consumerUrl': consumerUrl })
+  .then( (registeringPlatform) => {
+    if (typeof registeringPlatform === 'undefined' || registeringPlatform.length === 0) {
+    
+      const keyPairs = keyGenerator();
+  
+      // creates/inserts platform data into database.
+      Database.Insert('platforms', platformSchema, { 
+        'consumerUrl': consumerUrl,
+        'consumerName': consumerName,
+        'consumerToolClientID': consumerToolClientID,
+        'consumerAuthorizationURL': consumerAuthorizationURL,
+        'consumerAccessTokenURL': consumerAccessTokenURL,
+        'consumerRedirect_URI': consumerRedirect_URI,
+        'kid': keyPairs,
+        'consumerAuthorizationconfig': consumerAuthorizationconfig,
+      });
+      return console.log(`Platform registered at: ${consumerUrl}`);
+    } else {
+      existingPlatform = registeringPlatform;
+      return existingPlatform;
+    };
+})
+.catch(err => console.log(`Error finding platform: ${err}`));
+return existingPlatform;
 };
 
 module.exports = { platformSchema, registerPlatform };

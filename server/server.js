@@ -6,7 +6,8 @@ const MongoStore = require('connect-mongo')(session);
 const mongoose = require('mongoose');
 
 //Required Library methods
-const { registerPlatform } = require('../lti_lib/register_platform');
+const Database = require('../lti_lib/mongoDB/Database');
+const { platformSchema, registerPlatform } = require('../lti_lib/register_platform');
 const { valid_oauth2_request } = require("../lti_lib/oauth2_validation");
 const { create_oidc_response, create_unique_string } = require("../lti_lib/oidc");
 const { launchTool } = require("../lti_lib/launch_validation");
