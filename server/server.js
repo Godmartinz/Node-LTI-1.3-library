@@ -101,7 +101,6 @@ app.use(session({
   store: new MongoStore({ mongooseConnection: mongoose.connection })
 }));
 
-
 /*
 * Routes below are for OAuth, OIDC, and Token usage
 */

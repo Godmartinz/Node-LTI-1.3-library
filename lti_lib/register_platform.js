@@ -11,10 +11,14 @@ const platformSchema = new Schema({
   consumerAccessTokenURL: String,
   consumerRedirect_URI: String,
 <<<<<<< HEAD
+<<<<<<< HEAD
   kid: Object,
 =======
   kid: Array,
 >>>>>>> Gd flow fix (#53)
+=======
+  kid: Object,
+>>>>>>> Gd flow fix (#57)
   consumerAuthorizationconfig: {
     method: String,
     key: String
@@ -38,6 +42,7 @@ const registerPlatform = async (
   if ( !consumerUrl || !consumerName || !consumerToolClientID || !consumerAuthorizationURL || !consumerAccessTokenURL || !consumerRedirect_URI || !consumerAuthorizationconfig ) {
     console.log('Error: registerPlatform function is missing argument.');
   };
+<<<<<<< HEAD
 <<<<<<< HEAD
   let existingPlatform;
 
@@ -92,6 +97,36 @@ return existingPlatform;
     return console.log(`Platform registered at: ${consumerUrl}`);
   };
 >>>>>>> Gd flow fix (#53)
+=======
+  let existingPlatform;
+
+  //checks database for existing platform.
+  await Database.Get('platforms', platformSchema,{ 'consumerUrl': consumerUrl })
+  .then( (registeringPlatform) => {
+    if (typeof registeringPlatform === 'undefined' || registeringPlatform.length === 0) {
+    
+      const keyPairs = keyGenerator();
+  
+      // creates/inserts platform data into database.
+      Database.Insert('platforms', platformSchema, { 
+        'consumerUrl': consumerUrl,
+        'consumerName': consumerName,
+        'consumerToolClientID': consumerToolClientID,
+        'consumerAuthorizationURL': consumerAuthorizationURL,
+        'consumerAccessTokenURL': consumerAccessTokenURL,
+        'consumerRedirect_URI': consumerRedirect_URI,
+        'kid': keyPairs,
+        'consumerAuthorizationconfig': consumerAuthorizationconfig,
+      });
+      return console.log(`Platform registered at: ${consumerUrl}`);
+    } else {
+      existingPlatform = registeringPlatform;
+      return existingPlatform;
+    };
+})
+.catch(err => console.log(`Error finding platform: ${err}`));
+return existingPlatform;
+>>>>>>> Gd flow fix (#57)
 };
 
 module.exports = { platformSchema, registerPlatform };

@@ -8,6 +8,9 @@ class Database {
   static async Get(collection, platformSchema, query) {
     let Model = mongoose.model(collection, platformSchema);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Gd flow fix (#57)
     let platformData;
 
       await Model.find(query)
@@ -18,6 +21,7 @@ class Database {
 
       return platformData;
 
+<<<<<<< HEAD
 =======
     let platformData = [];
 
@@ -30,11 +34,16 @@ class Database {
     });
     return platformData; 
 >>>>>>> Gd flow fix (#53)
+=======
+>>>>>>> Gd flow fix (#57)
   };
 
   static async GetKey(collection, platformSchema, query) {
     let Model = mongoose.model(collection, platformSchema);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Gd flow fix (#57)
     let publicKey;
 
     await Model.find(query)
@@ -42,6 +51,7 @@ class Database {
       publicKey = key[0].kid.publicKey;
     })
     .catch(err => console.log(`Error finding platform ${err}`));
+<<<<<<< HEAD
 =======
     let publicKey = [];
 
@@ -53,6 +63,8 @@ class Database {
       }
     });
 >>>>>>> Gd flow fix (#53)
+=======
+>>>>>>> Gd flow fix (#57)
     return publicKey;
   }
 

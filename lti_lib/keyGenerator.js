@@ -24,9 +24,13 @@ function passPhrase() {
 function keyGenerator() {
   var keys = {};
 <<<<<<< HEAD
+<<<<<<< HEAD
   var kid = passPhrase();
 =======
 >>>>>>> Gd flow fix (#53)
+=======
+  var kid = passPhrase();
+>>>>>>> Gd flow fix (#57)
 
   const { publicKey, privateKey } = generateKeyPairSync(
     "rsa",
@@ -57,10 +61,14 @@ function keyGenerator() {
   );
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   keys = { 'publicKey': publicKey , 'privateKey': privateKey, keyID: kid };
 =======
   keys = { 'publicKey': publicKey , 'privateKey': privateKey };
 >>>>>>> Gd flow fix (#53)
+=======
+  keys = { 'publicKey': publicKey , 'privateKey': privateKey, keyID: kid };
+>>>>>>> Gd flow fix (#57)
   return keys;
 }
 
