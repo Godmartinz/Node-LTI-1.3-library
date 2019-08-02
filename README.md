@@ -12,13 +12,13 @@ In the future, this Library will be updated to fully support the LTI Advantage e
 
 Follow these steps to implement this Library:
 
-[Develop a Tool](#develop-a-tool)
-[Install Library](#install-library)
-[Setup Server and Routes](#setup-server-and-routes)
-[Setup MongoDB](#setup-mongodb)
-[Add Tool to Platform](#add-tool-to-platform)
-[Register Platform with Tool](#register-platform-with-tool)
-[Run your Server](#run-your-server)
+-[Develop a Tool](#develop-a-tool)
+-[Install Library](#install-library)
+-[Setup Server and Routes](#setup-server-and-routes)
+-[Setup MongoDB](#setup-mongodb)
+-[Add Tool to Platform](#add-tool-to-platform)
+-[Register Platform with Tool](#register-platform-with-tool)
+-[Run your Server](#run-your-server)
 
 Optionally, you can:
 
