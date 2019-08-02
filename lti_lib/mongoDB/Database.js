@@ -4,29 +4,27 @@ class Database {
 
   static async Get(collection, platformSchema, query) {
     let Model = mongoose.model(collection, platformSchema);
-    let platformData = [];
+    let platformData;
 
-    await Model.find(query, (err, registeredPlatform) => {
-      if (err) {
-        return console.log(`Error finding platform: ${err}`);
-      } else {
-        platformData = [...registeredPlatform];
-      }
-    });
-    return platformData; 
+      await Model.find(query)
+      .then(registeredPlatform => {
+        platformData = registeredPlatform;
+      })
+      .catch(err => console.log(`Error finding platform ${err}`));
+
+      return platformData;
   };
 
   static async GetKey(collection, platformSchema, query) {
     let Model = mongoose.model(collection, platformSchema);
-    let publicKey = [];
+    let publicKey;
 
-    await Model.find(query, (err, key) => {
-      if (err) {
-        return console.log(`Error finding public key for: ${query.consumerURL}`);
-      } else {
-        publicKey = key[0].kid[0];
-      }
-    });
+    await Model.find(query)
+    .then(key => {
+      publicKey = key[0].kid.publicKey;
+    })
+    .catch(err => console.log(`Error finding platform ${err}`));
+    
     return publicKey;
   }
 

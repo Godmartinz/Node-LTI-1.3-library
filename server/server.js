@@ -6,7 +6,8 @@ const MongoStore = require('connect-mongo')(session);
 const mongoose = require('mongoose');
 
 //Required Library methods
-const { registerPlatform } = require('../lti_lib/register_platform');
+const Database = require('../lti_lib/mongoDB/Database');
+const { platformSchema, registerPlatform } = require('../lti_lib/register_platform');
 const { valid_oauth2_request } = require("../lti_lib/oauth2_validation");
 const { create_oidc_response } = require("../lti_lib/oidc");
 const { launchTool } = require("../lti_lib/launch_validation");
@@ -58,25 +59,35 @@ mongoose.connect(process.env.MONGODB_URI/*'mongodb://localhost:27017/TESTLTI'*/,
 });
 mongoose.Promise = Promise;
   
+registerPlatform(
+  'https://www.sandiegocode.school',
+  'SanDiegocode.school',
+  'uuYLGWBmhhuZvBf',
+  'https://www.sandiegocode.school/mod/lti/auth.php',
+  'https://www.sandiegocode.school/mod/lti/token.php',
+  'https://www.sandiegocode.school/project/submit',
+  { method: 'JWK_SET', key: 'https://www.sandiegocode.school/mod/lti/certs.php' }
+);
+
 // registerPlatform(
-//   'https://www.sandiegocode.school',
-//   'SanDiegocode.school',
-//   'uuYLGWBmhhuZvBf',
-//   'https://www.sandiegocode.school/mod/lti/auth.php',
-//   'https://www.sandiegocode.school/mod/lti/token.php',
-//   'https://www.sandiegocode.school/project/submit',
-//   { method: 'JWK_SET', key: 'https://www.sandiegocode.school/mod/lti/certs.php' }
+//   'https://demo.moodle.net',
+//   'Moodles demo',
+//   'CyKAucwWddL1wtH',
+//   'https://demo.moodle.net/mod/lti/auth.php',
+//   'https://demo.moodle.net/mod/lti/token.php',
+//   'https://node-lti-v1p3.herokuapp.com/project/submit',
+//   { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
 // );
 
-registerPlatform(
-  'https://demo.moodle.net',
-  'Moodles demo',
-  'CyKAucwWddL1wtH',
-  'https://demo.moodle.net/mod/lti/auth.php',
-  'https://demo.moodle.net/mod/lti/token.php',
-  'https://node-lti-v1p3.herokuapp.com/project/submit',
-  { method: 'JWK_SET', key: 'https://demo.moodle.net/mod/lti/certs.php' }
-); 
+app.get('/publickey', async (req, res) => {
+  let publicKey = await Database.GetKey(
+    'platforms',
+    platformSchema,
+    { consumerUrl: 'https://www.sandiegocode.school' } // base URL used when registering your platform.
+  );
+
+    res.render('publicKey', {key: publicKey});
+});
 
 /*
 * Setup Session to store data
