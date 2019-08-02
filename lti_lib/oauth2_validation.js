@@ -30,16 +30,18 @@ function valid_oauth2_request(req) {
     if (!body.hasOwnProperty('client_id')) {
       errors.push('client id missing')
     } else {
-      if (body.client_id !== body.consumerToolClientID) {
-        errors.push('client id invalid')
-      }
+      //TODO: Must retrieve Consumer information from DB
+      if (body.client_id === '') {
+          errors.push('client id invalid')
+        }
     }
-
+      
     // Check the client_secret
     if (!body.hasOwnProperty('client_secret')) {
       errors.push('client secret missing')
     } else {
-      if (body.client_secret !== body.privateKey) {
+      //TODO: Must retrieve Consumer information from DB
+      if (body.client_secret === '') {
         errors.push('client secret invalid')
       }
     }

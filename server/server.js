@@ -8,7 +8,6 @@ const mongoose = require('mongoose');
 //Required Library methods
 const Database = require('../lti_lib/mongoDB/Database');
 const { platformSchema, registerPlatform } = require('../lti_lib/register_platform');
-const { valid_oauth2_request } = require("../lti_lib/oauth2_validation");
 const { create_oidc_response, create_unique_string } = require("../lti_lib/oidc");
 const { launchTool } = require("../lti_lib/launch_validation");
 const { tokenMaker } = require("../lti_lib/token_generator");
@@ -71,7 +70,6 @@ registerPlatform(
   'https://demo.moodle.net',
   'moodle',
   '8tDENy4kyX9N59M',
-
   'https://demo.moodle.net/mod/lti/auth.php',
   'https://demo.moodle.net/mod/lti/token.php',
   'https://node-lti-v1p3.herokuapp.com/project/submit',
@@ -116,8 +114,7 @@ app.post('/oidc', (req, res) => {
 
 app.post("/oauth2/token", (req, res) => {
   //LIBRARY:  Route not currently being used
-  var errors = valid_oauth2_request(req);
-  tokenMaker(errors, res);
+  tokenMaker(req, res);
 });
 
 app.post('/auth_code', (req, res) => {
@@ -211,7 +208,7 @@ app.get('/demo/project/submit', (req, res) => {
   'https://purl.imsglobal.org/spec/lti/claim/context':
      { id: '47',
        label: 'AGILE200',
-       title: 'Internship',
+       title: 'NOTE: DEMO ONLY, THIS TOOL IS NOT FUNCTIONAL',
        type: [ 'CourseSection' ] },
     'https://purl.imsglobal.org/spec/lti/claim/resource_link': { title: 'Test LTI for Team Pied Piper', id: '4' },
     given_name: 'John',
