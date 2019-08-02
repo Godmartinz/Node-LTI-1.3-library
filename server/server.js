@@ -41,10 +41,8 @@ app.use( (req,res,next) => {
 app.set("views", "./views");
 app.set("view engine", "ejs");
 
-/*
-* Setup MongoDB to store Platform data
+/** Setup MongoDB to store Platform data
 */
-
 mongoose.connect(process.env.MONGODB_URI/*'mongodb://localhost:27017/TESTLTI'*/, {
   useNewUrlParser: true, 
   auth: {
